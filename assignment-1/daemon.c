@@ -79,55 +79,53 @@ int main()
           // Log file goes here
           // TODO create your logging functionality here to a file
 
-
           // Orphan Logic goes here!! 
           // Keep process running with infinite loop
           // When the parent finishes after 10 seconds, 
           // the getppid() will return 1 as the parent (init process)
           
-	  struct tm check_uploads_time;
-	  time(&now);  /* get current time; same as: now = time(NULL)  */
-	  check_uploads_time = *localtime(&now);
-	  check_uploads_time.tm_hour = 23; 
-	  check_uploads_time.tm_min = 30; 
-	  check_uploads_time.tm_sec = 0;
+          struct tm check_uploads_time;
+          time(&now);  /* get current time; same as: now = time(NULL)  */
+          check_uploads_time = *localtime(&now);
+          check_uploads_time.tm_hour = 23; 
+          check_uploads_time.tm_min = 30; 
+          check_uploads_time.tm_sec = 0;
 	
-  	  while(1) {
-	  	sleep(1);
+          while(1) {
+            sleep(1);
 
-		if(signal(SIGINT, sig_handler) == SIG_ERR) {
-			syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
-		} 
-
+            if(signal(SIGINT, sig_handler) == SIG_ERR) {
+              syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
+            } 
 		
-		//countdown to 23:30
-	  	time(&now);
-		double seconds_to_files_check = difftime(now,mktime(&check_uploads_time));
-		//syslog(LOG_INFO, "%.f seconds until check for xml uploads", seconds_to_files_check);
-		if(seconds_to_files_check == 0) {
-			check_file_uploads();
+            //countdown to 23:30
+            time(&now);
+            double seconds_to_files_check = difftime(now,mktime(&check_uploads_time));
+            //syslog(LOG_INFO, "%.f seconds until check for xml uploads", seconds_to_files_check);
+            if(seconds_to_files_check == 0) {
+              check_file_uploads();
 
-			//change to tommorow's day
-			update_timer(&check_uploads_time);
-		}
-				
+              //change to tommorow's day
+              update_timer(&check_uploads_time);
+            }
 
-		//countdown to 1:00
-		time(&now);
-		double seconds_to_transfer = difftime(now, mktime(&backup_time));
-		//syslog(LOG_INFO, "%.f seconds until backup", seconds_to_files_check);
-		if(seconds_to_transfer == 0) {
-			lock_directories();
-			collect_reports();	  
-			backup_dashboard();
-			sleep(30);
-			unlock_directories();
-			generate_reports();
-			//after actions are finished, start counting to next day
-			update_timer(&backup_time);
-		}	
-	  }
-	}	
+            //countdown to 1:00
+            time(&now);
+            double seconds_to_transfer = difftime(now, mktime(&backup_time));
+            //syslog(LOG_INFO, "%.f seconds until backup", seconds_to_files_check);
+            if(seconds_to_transfer == 0) {
+              lock_directories();
+              collect_reports();	  
+              backup_dashboard();
+              sleep(30);
+              unlock_directories();
+              generate_reports();
+              //after actions are finished, start counting to next day
+              update_timer(&backup_time);
+            }	
+	        }
+	      }
+
 	closelog();
        return 0;
     }
