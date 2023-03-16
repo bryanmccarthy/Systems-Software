@@ -71,6 +71,8 @@ int main() {
             // Signal Handler goes here
             // signal(SIGINT, sig_handler);
 
+
+            syslog(LOG_INFO, "File open for logging\n");
             // Log file goes here
             // TODO: create your logging functionality here to a file
             FILE *logfile;
