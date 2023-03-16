@@ -68,24 +68,27 @@ int main() {
                 close (x);
             } 
 
-            // Signal Handler goes here
-            // signal(SIGINT, sig_handler);
-
+            // Signal Handler
+            if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+                syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
+            } else {
+                syslog(LOG_INFO, "Signal handler registered");
+            }
 
             syslog(LOG_INFO, "File open for logging\n");
             // Log file goes here
             // TODO: create your logging functionality here to a file
-            FILE *logfile;
+            // FILE *logfile;
 
-            logfile = fopen("reports/log.txt", "a+");
+            // logfile = fopen("reports/log.txt", "a+");
 
-            if (logfile == NULL) {
-              perror("Error opening file!");
-              kill(getpid(), SIGTERM);
-            }
+            // if (logfile == NULL) {
+            //   perror("Error opening file!");
+            //   kill(getpid(), SIGTERM);
+            // }
 
-            fprintf(logfile, "This is a log message\n");
-            fclose(logfile);
+            // fprintf(logfile, "This is a log message\n");
+            // fclose(logfile);
           
             struct tm check_uploads_time;
             time(&now);  /* get current time; same as: now = time(NULL)  */
@@ -96,7 +99,7 @@ int main() {
 	
             while(1) {
                 sleep(1);
-                syslog(LOG_INFO, "Child process. Parent pid is %d \n", getppid());
+                syslog(LOG_INFO, "Child pid is %d. Parent pid is %d \n", getpid(), getppid());
 
                 if(signal(SIGINT, sig_handler) == SIG_ERR) {
                     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
