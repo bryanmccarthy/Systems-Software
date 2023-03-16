@@ -69,16 +69,17 @@ int main() {
             } 
 
             // Signal Handler goes here
+            signal(SIGINT, sig_handler);
 
             // Log file goes here
             // TODO: create your logging functionality here to a file
             FILE *logfile;
 
-            logfile = fopen("reports/log.txt", "w");
+            logfile = fopen("reports/log.txt", "a+");
 
             if (logfile == NULL) {
               printf("Error opening file!");
-              return 1;
+              kill(getpid(), SIGTERM);
             }
 
             fprintf(logfile, "This is a log message\n");
