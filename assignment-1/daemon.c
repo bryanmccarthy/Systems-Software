@@ -69,7 +69,7 @@ int main() {
             } 
 
             // Signal Handler goes here
-            signal(SIGINT, sig_handler);
+            // signal(SIGINT, sig_handler);
 
             // Log file goes here
             // TODO: create your logging functionality here to a file
@@ -78,7 +78,7 @@ int main() {
             logfile = fopen("reports/log.txt", "a+");
 
             if (logfile == NULL) {
-              printf("Error opening file!");
+              perror("Error opening file!");
               kill(getpid(), SIGTERM);
             }
 
