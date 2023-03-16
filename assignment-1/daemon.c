@@ -41,7 +41,7 @@ int main()
     if (pid > 0) {
         // if PID > 0 :: this is the parent
         // this process performs printf and finishes
-        //sleep(10);  // uncomment to wait 10 seconds before process ends
+        // sleep(10);  // uncomment to wait 10 seconds before process ends
         exit(EXIT_SUCCESS);
     } else if (pid == 0) {
        // Step 1: Create the orphan process
@@ -99,18 +99,18 @@ int main()
             //countdown to 23:30
             time(&now);
             double seconds_to_files_check = difftime(now,mktime(&check_uploads_time));
-            //syslog(LOG_INFO, "%.f seconds until check for xml uploads", seconds_to_files_check);
+            syslog(LOG_INFO, "%.f seconds until check for xml uploads", seconds_to_files_check);
             if(seconds_to_files_check == 0) {
               check_file_uploads();
 
               //change to tommorow's day
-              update_timer(&check_uploads_time);
+              // update_timer(&check_uploads_time);
             }
 
             //countdown to 1:00
             time(&now);
             double seconds_to_transfer = difftime(now, mktime(&backup_time));
-            //syslog(LOG_INFO, "%.f seconds until backup", seconds_to_files_check);
+            syslog(LOG_INFO, "%.f seconds until backup", seconds_to_files_check);
             if(seconds_to_transfer == 0) {
               lock_directories();
               collect_reports();	  
