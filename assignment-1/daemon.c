@@ -94,8 +94,7 @@ int main() {
 	
             while(1) {
                 sleep(1);
-
-                printf("Child process. Parent pid is %d \n", getppid());
+                syslog(LOG_INFO, "Child process. Parent pid is %d \n", getppid());
 
                 if(signal(SIGINT, sig_handler) == SIG_ERR) {
                     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
