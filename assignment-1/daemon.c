@@ -59,9 +59,8 @@ int main() {
             umask(0);
 
             // Change dir to root
-            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) { 
-                exit(EXIT_FAILURE); 
-            }
+            chdir("/"); // TODO: handle error
+            printf("Current working dir: %s\n", getcwd(NULL, 0));
 
             // Step 5: Close all open file descriptors
             /* Close all open file descriptors */
