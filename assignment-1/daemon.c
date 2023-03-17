@@ -59,7 +59,7 @@ int main() {
             umask(0);
 
             // Change dir to root
-            if (chdir("/") < 0) { 
+            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) { 
                 exit(EXIT_FAILURE); 
             }
 
