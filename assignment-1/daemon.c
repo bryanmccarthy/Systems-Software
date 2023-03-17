@@ -67,7 +67,7 @@ int main() {
             /* Close all open file descriptors */
             int x;
             for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
-                close (x);
+                close(x);
             } 
 
             // Signal Handler
