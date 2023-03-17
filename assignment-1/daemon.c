@@ -59,7 +59,9 @@ int main() {
             umask(0);
 
             // Change dir to root
-            chdir("/");
+            if (chdir("/") < 0) { 
+                exit(EXIT_FAILURE); 
+            }
 
             // Step 5: Close all open file descriptors
             /* Close all open file descriptors */
