@@ -80,7 +80,7 @@ int main() {
             // TODO: create your logging functionality here to a file
             FILE *logfile;
 
-            logfile = fopen("reports/log.txt", "a+");
+            logfile = fopen("reports/log.txt", "w");
 
             if (logfile == NULL) {
               perror("Error opening file!");
