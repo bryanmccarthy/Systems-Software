@@ -64,17 +64,17 @@ int main() {
 
             // Step 5: Close all open file descriptors
             /* Close all open file descriptors */
-            int x;
-            for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
-                close(x);
-            } 
+            int maxfd = sysconf(_SC_OPEN_MAX);
+            for (int fd = 0; fd < maxfd; fd++) {
+                close(fd);
+            }
 
             // Signal Handler
-            if (signal(SIGTERM, sig_handler) == SIG_ERR) {
-                syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
-            } else {
-                syslog(LOG_INFO, "Signal handler registered");
-            }
+            // if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+            //     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
+            // } else {
+            //     syslog(LOG_INFO, "Signal handler registered");
+            // }
 
             // Log file goes here
             // TODO: create your logging functionality here to a file
