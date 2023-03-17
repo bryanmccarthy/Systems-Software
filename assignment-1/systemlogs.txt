@@ -1,85 +1,90 @@
 Daemon is running
--55 seconds until check for xml uploads
--115 seconds until backup
+-24 seconds until check for xml uploads
+-54 seconds until backup
 Daemon is running
--50 seconds until check for xml uploads
--110 seconds until backup
+-19 seconds until check for xml uploads
+-49 seconds until backup
 Daemon is running
--45 seconds until check for xml uploads
--105 seconds until backup
+-14 seconds until check for xml uploads
+-44 seconds until backup
 Daemon is running
--40 seconds until check for xml uploads
--100 seconds until backup
+-9 seconds until check for xml uploads
+-39 seconds until backup
 Daemon is running
--35 seconds until check for xml uploads
--95 seconds until backup
+-4 seconds until check for xml uploads
+-34 seconds until backup
 Daemon is running
--30 seconds until check for xml uploads
--90 seconds until backup
+1 seconds until check for xml uploads
+-29 seconds until backup
+Daemon is running
+6 seconds until check for xml uploads
+-24 seconds until backup
+Daemon is running
+11 seconds until check for xml uploads
+-19 seconds until backup
+Daemon is running
+16 seconds until check for xml uploads
+-14 seconds until backup
 Daemon is running
 -25 seconds until check for xml uploads
--85 seconds until backup
-Daemon is running
--20 seconds until check for xml uploads
--80 seconds until backup
-Daemon is running
--15 seconds until check for xml uploads
--75 seconds until backup
-Daemon is running
--10 seconds until check for xml uploads
--70 seconds until backup
-Daemon is running
--5 seconds until check for xml uploads
--65 seconds until backup
-Daemon is running
-0 seconds until check for xml uploads
-Checking for file uploads
-Current day is 17; changing timer to tommorow's day
-Timer updated to tommorow, 18
--60 seconds until backup
-Daemon is running
--86395 seconds until check for xml uploads
 -55 seconds until backup
 Daemon is running
--86390 seconds until check for xml uploads
+-20 seconds until check for xml uploads
 -50 seconds until backup
 Daemon is running
--86385 seconds until check for xml uploads
+-15 seconds until check for xml uploads
 -45 seconds until backup
 Daemon is running
--86380 seconds until check for xml uploads
+-10 seconds until check for xml uploads
 -40 seconds until backup
 Daemon is running
--86375 seconds until check for xml uploads
+-5 seconds until check for xml uploads
 -35 seconds until backup
 Daemon is running
--86370 seconds until check for xml uploads
+0 seconds until check for xml uploads
+
+Checking for file uploads
+Done Checking for file uploads
+
+Current day is 17; changing timer to tommorow's date
+Timer updated to tommorow's date: 18
 -30 seconds until backup
 Daemon is running
--86365 seconds until check for xml uploads
+-86395 seconds until check for xml uploads
 -25 seconds until backup
 Daemon is running
--86360 seconds until check for xml uploads
+-86390 seconds until check for xml uploads
 -20 seconds until backup
 Daemon is running
--86355 seconds until check for xml uploads
+-86385 seconds until check for xml uploads
 -15 seconds until backup
 Daemon is running
--86350 seconds until check for xml uploads
--10 seconds until backup
+-24 seconds until check for xml uploads
+-54 seconds until backup
 Daemon is running
--86345 seconds until check for xml uploads
--5 seconds until backup
+-19 seconds until check for xml uploads
+-49 seconds until backup
 Daemon is running
--86340 seconds until check for xml uploads
-0 seconds until backup
-Locking directories
-Collecting reports
-Backing up dashboard
-Unlocking directories
-Generating reports
-Current day is 17; changing timer to tommorow's day
-Timer updated to tommorow, 18
+-14 seconds until check for xml uploads
+-44 seconds until backup
 Daemon is running
--86305 seconds until check for xml uploads
--86365 seconds until backup
+-9 seconds until check for xml uploads
+-39 seconds until backup
+Daemon is running
+-4 seconds until check for xml uploads
+-34 seconds until backup
+Daemon is running
+1 seconds until check for xml uploads
+-29 seconds until backup
+Daemon is running
+6 seconds until check for xml uploads
+-24 seconds until backup
+Daemon is running
+11 seconds until check for xml uploads
+-19 seconds until backup
+Daemon is running
+16 seconds until check for xml uploads
+-14 seconds until backup
+Daemon is running
+21 seconds until check for xml uploads
+-9 seconds until backup

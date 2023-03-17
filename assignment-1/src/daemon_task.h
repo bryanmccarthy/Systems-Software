@@ -1,0 +1,26 @@
+#ifndef DAEMON_TASKS 
+#define DAEMON_TASKS
+
+#define UPLOAD_DIR "/workspaces/Systems-Software/assignment-1/directories/upload_directory"
+#define REPORTING_DIR "/workspaces/Systems-Software/assignment-1/directories/reporting_directory"
+#define DASHBOARD_DIR "/workspaces/Systems-Software/assignment-1/directories/dashboard_directory"
+#define LOG_FILE "/workspaces/Systems-Software/assignment-1/log.txt"
+
+#include <time.h>
+
+void collect_reports(void);
+
+void backup_dashboard(void);
+
+void lock_directories(void);
+
+void unlock_directories(void );
+
+void generate_reports(void);
+
+void check_file_uploads(void);
+
+void sig_handler(int);
+
+void update_timer(struct tm*);
+#endif

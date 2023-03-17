@@ -51,10 +51,13 @@ int main() {
         sleep(3);
         exit(EXIT_SUCCESS);
     } else if (pid == 0) {
+        // Child process
         printf("Forked: Child process: %d, Childs parent: %d\n", getpid(), getppid());
       
         // Elevate the orphan process to session leader to lose controlling TTY
-        if (setsid() < 0) { exit(EXIT_FAILURE); }
+        if (setsid() < 0) { 
+            exit(EXIT_FAILURE); 
+        }
 
         // We could fork here again , just to guarantee that the process is not a session leader
         int pid = fork();
@@ -68,7 +71,10 @@ int main() {
             umask(0);
 
             // Change dir to root
-            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) {
+            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) { // TODO: /
+                systemlogs = fopen("systemlogs.txt", "a+");
+                fprintf(systemlogs, "ERROR: daemon.c : chdir() failed");
+                fclose(systemlogs);
                 exit(EXIT_FAILURE);
             }
 
@@ -84,6 +90,11 @@ int main() {
                 fprintf(systemlogs, "ERROR: daemon.c : SIG_ERR RECEIVED");
                 fclose(systemlogs);
             }
+
+            // Watch UPLOAD_DIR for file changes
+            char audit_watch[256];
+            snprintf(audit_watch, sizeof(audit_watch), "sudo auditctl -w %s -p rwxa -k directory-watch", UPLOAD_DIR);
+            system(audit_watch);
 	
             while(1) {
                 sleep(5); // TODO: Change this to 1 second
@@ -102,9 +113,7 @@ int main() {
 
                 if(seconds_to_files_check == 0) {
                     check_file_uploads();
-
-                    // Reset timer to 23:30
-                    update_timer(&check_uploads_time);
+                    update_timer(&check_uploads_time); // Reset timer to 23:30
                 }
 
                 // Countdown to 1:00
@@ -122,8 +131,7 @@ int main() {
                     sleep(30);
                     unlock_directories();
                     generate_reports();
-                    // Reset timer to 1:00
-                    update_timer(&backup_time);
+                    update_timer(&backup_time); // Reset timer to 1:00
                 }	
             }
           }
