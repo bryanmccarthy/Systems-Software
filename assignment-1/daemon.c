@@ -69,6 +69,8 @@ int main() {
                 close(fd);
             }
 
+            printf("Before file open\n");
+
             // Signal Handler
             // if (signal(SIGTERM, sig_handler) == SIG_ERR) {
             //     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
