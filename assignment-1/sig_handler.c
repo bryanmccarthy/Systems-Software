@@ -8,7 +8,7 @@
 void sig_handler(int sigNum) {
     FILE *systemlogs;
 
-    if (sigNum == SIGUSR1) {
+    if (sigNum == SIGINT) {
         systemlogs = fopen("systemlogs.txt", "a+");
         fprintf(systemlogs, "RECEIVED SIGNAL INTERRUPT, INITIATING BACKUP AND TRANSFER\n");
         fclose(systemlogs);

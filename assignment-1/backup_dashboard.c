@@ -7,5 +7,9 @@
 #include <stdlib.h>
 
 void backup_dashboard(void) {
-    printf("backup code should go here..");
+    FILE *systemlogs;
+
+    systemlogs = fopen("systemlogs.txt", "a+");
+    fprintf(systemlogs, "Backing up dashboard\n");
+    fclose(systemlogs);
 }

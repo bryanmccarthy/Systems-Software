@@ -7,5 +7,9 @@
 #include <syslog.h>
 
 void lock_directories() {
-    printf("lock directory functionality should go here. fork/chmod will be used here to change permissions");
+    FILE *systemlogs;
+
+    systemlogs = fopen("systemlogs.txt", "a+");
+    fprintf(systemlogs, "Locking directories\n");
+    fclose(systemlogs);
 }

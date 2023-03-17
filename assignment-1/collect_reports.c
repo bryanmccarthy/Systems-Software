@@ -3,7 +3,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <syslog.h>
+#include <sys/types.h>
 
 void collect_reports(void) {
-    printf("collect reports functionality could go here.. fork/cp will probably be used");
+    FILE *systemlogs;
+
+    systemlogs = fopen("systemlogs.txt", "a+");
+    fprintf(systemlogs, "Collecting reports\n");
+    fclose(systemlogs);
 }

@@ -1,3 +1,0 @@
-The file test.txt was created.
-The file test.txt was modified.
-The file test.txt was modified.

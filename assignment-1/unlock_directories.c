@@ -7,5 +7,9 @@
 #include <syslog.h>
 
 void unlock_directories() {
-    printf("unlock directory functionality should go here. fork/chmod will be used here to change permissions");
+    FILE *systemlogs;
+
+    systemlogs = fopen("systemlogs.txt", "a+");
+    fprintf(systemlogs, "Unlocking directories\n");
+    fclose(systemlogs);
 }
