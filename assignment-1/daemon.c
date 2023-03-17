@@ -22,8 +22,33 @@
 #include <time.h>
 #include "daemon_task.h"
 #include <signal.h>
+#include <sys/inotify.h>
+
+#define EVENT_SIZE    (sizeof (struct inotify_event))
+#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
 
 int main() {
+    FILE *systemlogs;
+    FILE *xmllogs;
+    int fd, wd, length, counter = 0; // File descriptor / Watch descriptor / Length of the event / Counter
+    char buffer[EVENT_BUF_LEN]; // Buffer for inotify events
+
+    // Create an inotify instance
+    fd = inotify_init();
+
+    if (fd < 0) {
+      perror("inotify_init");
+      exit(EXIT_FAILURE);
+    }
+
+    // Add a watch to the xml_upload_directory
+    wd = inotify_add_watch(fd, "xml_upload_directory", IN_CREATE | IN_MODIFY | IN_DELETE);
+
+    if (wd < 0) {
+      perror("inotify_add_watch");
+      exit(EXIT_FAILURE);
+    }
+
     time_t now;
     struct tm backup_time;
     time(&now);  /* get current time; same as: now = time(NULL)  */
@@ -32,14 +57,12 @@ int main() {
     backup_time.tm_min = 0; 
     backup_time.tm_sec = 0;
 
-    // Implementation for Singleton Pattern if desired (Only one instance running)
-
     // Create a child process      
     int pid = fork();
  
     if (pid > 0) {
         printf("Parent process: %d\n", getpid());
-        // sleep(10);
+        sleep(3);
         exit(EXIT_SUCCESS);
     } else if (pid == 0) {
         // Step 1: Create the orphan process
@@ -59,39 +82,24 @@ int main() {
             umask(0);
 
             // Change dir to root
-            chdir("/"); // TODO: handle error
+            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) {
+                exit(EXIT_FAILURE);
+            }
             printf("Current working dir: %s\n", getcwd(NULL, 0));
 
             // Step 5: Close all open file descriptors
-            /* Close all open file descriptors */
-            int maxfd = sysconf(_SC_OPEN_MAX);
-            for (int fd = 0; fd < maxfd; fd++) {
-                close(fd);
-            }
-
-            printf("Before file open\n");
-
-            // Signal Handler
-            // if (signal(SIGTERM, sig_handler) == SIG_ERR) {
-            //     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
-            // } else {
-            //     syslog(LOG_INFO, "Signal handler registered");
+            // int maxfd = sysconf(_SC_OPEN_MAX);
+            // for (int fd = 0; fd < maxfd; fd++) {
+            //     close(fd);
             // }
 
-            // Log file goes here
-            // TODO: create your logging functionality here to a file
-            FILE *logfile;
-
-            logfile = fopen("reports/log.txt", "w");
-
-            if (logfile == NULL) {
-              perror("Error opening file!");
-              kill(getpid(), SIGTERM);
+            // Signal Handler
+            if (signal(SIGUSR1, sig_handler) == SIG_ERR) {
+                systemlogs = fopen("systemlogs.txt", "a+");
+                fprintf(systemlogs, "ERROR: daemon.c : SIG_ERR RECEIVED");
+                fclose(systemlogs);
             }
-
-            fprintf(logfile, "This is a new log message\n");
-            fclose(logfile);
-          
+            
             struct tm check_uploads_time;
             time(&now);  /* get current time; same as: now = time(NULL)  */
             check_uploads_time = *localtime(&now);
@@ -101,16 +109,54 @@ int main() {
 	
             while(1) {
                 sleep(1);
-                syslog(LOG_INFO, "Child pid is %d. Parent pid is %d \n", getpid(), getppid());
 
-                if(signal(SIGINT, sig_handler) == SIG_ERR) {
-                    syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
-                } 
+                counter = 0; // Reset counter
+                length = read(fd, buffer, EVENT_BUF_LEN);
+
+                if (length < 0) {
+                    perror("read");
+                    exit(EXIT_FAILURE);
+                }
+                
+                while (counter < length) {
+                    struct inotify_event *event = (struct inotify_event *) &buffer[counter];
+                    if (event->len) {
+                        xmllogs = fopen("xmllogs.txt", "a+"); // open xmllogs.txt
+
+                        if (event->mask & IN_CREATE) {
+                            if (event->mask & IN_ISDIR) {
+                                fprintf(xmllogs, "The directory %s was created.\n", event->name);
+                            } else {
+                                fprintf(xmllogs, "The file %s was created.\n", event->name);
+                            }
+                        } else if (event->mask & IN_DELETE) {
+                            if (event->mask & IN_ISDIR) {
+                                fprintf(xmllogs, "The directory %s was deleted.\n", event->name);
+                            } else {
+                                fprintf(xmllogs, "The file %s was deleted.\n", event->name);
+                            }
+                        } else if (event->mask & IN_MODIFY) {
+                            if (event->mask & IN_ISDIR) {
+                                fprintf(xmllogs, "The directory %s was modified.\n", event->name);
+                            } else {
+                                fprintf(xmllogs, "The file %s was modified.\n", event->name);
+                            }
+                        }
+                        fclose(xmllogs); // close xmllogs.txt
+                    }
+                    counter += EVENT_SIZE + event->len;
+                }
+
+                // kill(getpid(), SIGUSR1); // Testing
         
                 //countdown to 23:30
                 time(&now);
                 double seconds_to_files_check = difftime(now,mktime(&check_uploads_time));
-                syslog(LOG_INFO, "%.f seconds until check for xml uploads", seconds_to_files_check);
+
+                systemlogs = fopen("systemlogs.txt", "a+");
+                fprintf(systemlogs, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
+                fclose(systemlogs);
+
                 if(seconds_to_files_check == 0) {
                     check_file_uploads();
 
@@ -121,7 +167,10 @@ int main() {
                 //countdown to 1:00
                 time(&now);
                 double seconds_to_transfer = difftime(now, mktime(&backup_time));
-                syslog(LOG_INFO, "%.f seconds until backup", seconds_to_files_check);
+
+                systemlogs = fopen("systemlogs.txt", "a+");
+                fprintf(systemlogs, "%.f seconds until backup\n", seconds_to_transfer);
+                fclose(systemlogs);
 
                 if(seconds_to_transfer == 0) {
                     lock_directories();
