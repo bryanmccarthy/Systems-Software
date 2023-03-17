@@ -76,6 +76,7 @@ int main() {
             // } else {
             //     syslog(LOG_INFO, "Signal handler registered");
             // }
+            signal(SIGINT, sig_handler);
 
             printf("Log file open");
             // Log file goes here
