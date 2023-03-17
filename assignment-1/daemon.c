@@ -69,11 +69,11 @@ int main() {
             } 
 
             // Signal Handler
-            if (signal(SIGTERM, sig_handler) == SIG_ERR) {
-                syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
-            } else {
-                syslog(LOG_INFO, "Signal handler registered");
-            }
+            // if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+            //     syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
+            // } else {
+            //     syslog(LOG_INFO, "Signal handler registered");
+            // }
 
             syslog(LOG_INFO, "File open for logging\n");
             // Log file goes here
