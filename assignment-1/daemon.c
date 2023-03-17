@@ -75,7 +75,7 @@ int main() {
             //     syslog(LOG_INFO, "Signal handler registered");
             // }
 
-            syslog(LOG_INFO, "File open for logging\n");
+            printf("Log file open");
             // Log file goes here
             // TODO: create your logging functionality here to a file
             // FILE *logfile;
