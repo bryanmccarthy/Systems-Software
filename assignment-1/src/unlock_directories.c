@@ -7,47 +7,27 @@
 #include <syslog.h>
 #include "daemon_task.h"
 #include <sys/file.h>
+#include <stdlib.h>
 
 void unlock_directories() {
     FILE *systemlogs;
+    char *unlock_permissions = "755";
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Unlocking directories\n");
+    fprintf(systemlogs, "\nUnlocking directories\n");
     fclose(systemlogs);
 
     // Unlock the upload and reporting directories
-    int upload_fd = open(UPLOAD_DIR, O_RDONLY);
-    if (upload_fd == -1) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Error opening directory: %s\n", UPLOAD_DIR);
-        fclose(systemlogs);
-    }
+    char unlock_upload[100];
+    char unlock_reporting[100];
 
-    int reporting_fd = open(REPORTING_DIR, O_RDONLY);
-    if (reporting_fd == -1) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Error opening directory: %s\n", REPORTING_DIR);
-        fclose(systemlogs);
-        close(upload_fd);
-    }
+    sprintf(unlock_upload, "chmod %s %s", unlock_permissions, UPLOAD_DIR);
+    sprintf(unlock_reporting, "chmod %s %s", unlock_permissions, REPORTING_DIR);
 
-    if (flock(upload_fd, LOCK_UN) == -1) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Failed to acquire lock on upload directory\n");
-        fclose(systemlogs);
-        close(upload_fd);
-        close(reporting_fd);
-    }
-
-    if (flock(reporting_fd, LOCK_UN) == -1) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Failed to acquire lock on reporting directory\n");
-        fclose(systemlogs);
-        close(upload_fd);
-        close(reporting_fd);
-    }
+    system(unlock_upload);
+    system(unlock_reporting);
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Directories unlocked\n");
+    fprintf(systemlogs, "Directories unlocked\n\n");
     fclose(systemlogs);
 }

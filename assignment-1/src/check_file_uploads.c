@@ -14,7 +14,7 @@ void check_file_uploads() {
     int num_xml_files = 4;
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nChecking for file uploads\n");
+    fprintf(systemlogs, "\nChecking for file uploads...\n\n");
     fclose(systemlogs);
 
     DIR *dir;
@@ -61,6 +61,6 @@ void check_file_uploads() {
     }
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Done Checking for file uploads\n\n");
+    fprintf(systemlogs, "\nDone Checking for file uploads.\n\n");
     fclose(systemlogs);
 }

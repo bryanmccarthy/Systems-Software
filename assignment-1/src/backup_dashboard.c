@@ -16,37 +16,19 @@ void backup_dashboard(void) {
     fprintf(systemlogs, "\nBacking up dashboard\n");
     fclose(systemlogs);
 
-    DIR *dir;
-    struct dirent *entry;
+    char *backup_dir = BACKUP_DIR;
+    char *reporting_dir = REPORTING_DIR;
 
-    // Open the backup directory
-    dir = opendir(REPORTING_DIR);
-    if (dir == NULL) {
+    char cp_command[100];
+    snprintf(cp_command, sizeof(cp_command), "cp %s %s", reporting_dir, backup_dir); // TODO: Fix this
+
+    if (system(cp_command) == -1) {
         systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Error opening directory: %s\n", REPORTING_DIR);
+        fprintf(systemlogs, "Error backing up dashboard\n");
         fclose(systemlogs);
-        return;
     }
-
-    while ((entry = readdir(dir)) != NULL) {
-      // Move entry to backup directory
-      char *old_path = malloc(strlen(REPORTING_DIR) + strlen(entry->d_name) + 1);
-      strcpy(old_path, REPORTING_DIR);
-      strcat(old_path, entry->d_name);
-
-      char *new_path = malloc(strlen(BACKUP_DIR) + strlen(entry->d_name) + 1);
-      strcpy(new_path, BACKUP_DIR);
-      strcat(new_path, entry->d_name);
-
-      rename(old_path, new_path);
-
-      free(old_path);
-      free(new_path);
-    }
-
-    closedir(dir); // Close the upload directory
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Dashboard backed up\n\n");
+    fprintf(systemlogs, "Dashboard backed up\n");
     fclose(systemlogs);
 }

@@ -163,21 +163,6 @@ int main() {
                 fclose(systemlogs);
             }
 
-            // // Get login name
-            // struct passwd *user;
-
-            // uid_t uid = getuid();
-            // user = getpwuid(uid);
-            // if (user == NULL) {
-            //     perror("getpwuid");
-            //     exit(1);
-            // }
-
-            // int length, i = 0;
-            // char buffer[EVENT_BUF_LEN];
-            // time_t event_time;
-            // char *timestamp;
-
             // Inotify file descriptor
             int fd = inotify_init();
             if (fd < 0) {
@@ -228,10 +213,11 @@ int main() {
 
                 if(seconds_to_transfer == 0) {
                     lock_directories();
-                    collect_reports();	  
+                    collect_reports();
+                    sleep(10); 
                     backup_dashboard();
-                    sleep(20);
                     unlock_directories();
+                    sleep(10);
                     generate_reports();
                     update_timer(&backup_time); // Reset timer to 1:00
                 }	
@@ -243,7 +229,6 @@ int main() {
             pthread_join(thread_id, NULL);
           }
 
-	      closelog();
         return 0;
     }
 }

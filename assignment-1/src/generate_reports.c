@@ -11,6 +11,12 @@ void generate_reports(void) {
     FILE *systemlogs;
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Generating reports\n");
+    fprintf(systemlogs, "Generating reports...\n");
+    fclose(systemlogs);
+
+    // TODO: Generate reports
+
+    systemlogs = fopen(SYSTEM_LOGS, "a+");
+    fprintf(systemlogs, "Reports generated.\n");
     fclose(systemlogs);
 }
