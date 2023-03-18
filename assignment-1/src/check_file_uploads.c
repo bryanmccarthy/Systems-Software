@@ -19,7 +19,7 @@ void check_file_uploads() {
 
     DIR *dir;
     struct dirent *entry;
-    int files_found[num_xml_files];
+    int files_found[num_xml_files]; // 1 if file is found, 0 if not
 
     // Initally set all files to not found
     for (int i = 0; i < num_xml_files; i++) {
@@ -36,11 +36,13 @@ void check_file_uploads() {
     }
 
     while ((entry = readdir(dir)) != NULL) {
+      // Check if file is one of the xml files
       for (int i = 0; i < num_xml_files; i++) {
           if (strstr(entry->d_name, xml_files[i]) != NULL) {
               files_found[i] = 1; // Set file to found
           }
       }
+
       // Move entry to reporting directory
       char *old_path = malloc(strlen(UPLOAD_DIR) + strlen(entry->d_name) + 1);
       strcpy(old_path, UPLOAD_DIR);
@@ -67,6 +69,4 @@ void check_file_uploads() {
     systemlogs = fopen(SYSTEM_LOGS, "a+");
     fprintf(systemlogs, "Done Checking for file uploads\n\n");
     fclose(systemlogs);
-
-    sleep(20);
 }

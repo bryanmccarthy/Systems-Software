@@ -25,19 +25,84 @@
 #include <signal.h>
 #include <sys/inotify.h>
 #include <pwd.h>
+#include <pthread.h>
 
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
 
-int main() {
+// Thread for logging inotify events
+void *events_thread(void *arg) {
     FILE *systemlogs;
     FILE *log_file;
+
+    int fd = *(int *) arg;
+    time_t event_time;
+    char *timestamp;
+
+    struct passwd *user; // User struct
+    uid_t uid = getuid(); // Get user id
+    user = getpwuid(uid); // Get user name
+
+    int length, i = 0;
+    char buffer[EVENT_BUF_LEN];
+
+    while(1) {
+        sleep(1);
+        // Log inside inotify thread
+        systemlogs = fopen(SYSTEM_LOGS, "a+");
+        fprintf(systemlogs, "Inotify thread running\n");
+        fclose(systemlogs);
+
+        // Check for events
+        length = read(fd, buffer, EVENT_BUF_LEN);
+        if (length < 0) {
+            systemlogs = fopen(SYSTEM_LOGS, "a+");
+            fprintf(systemlogs, "ERROR: daemon.c : read() failed");
+            fclose(systemlogs);
+        }
+
+        // Process events and log them
+        if (length > 0) {
+          i = 0;
+          while (i < length) {
+              struct inotify_event *event = (struct inotify_event *)&buffer[i];
+              event_time = time(NULL);
+              timestamp = ctime(&event_time);
+
+              if (event->mask & IN_MODIFY) {
+                  log_file = fopen(LOG_FILE, "a+");
+                  fprintf(log_file, "File %s modified by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                  fclose(log_file);
+              }
+
+              if (event->mask & IN_CREATE) {
+                  log_file = fopen(LOG_FILE, "a+");
+                  fprintf(log_file, "File %s created by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                  fclose(log_file);
+              }
+
+              if (event->mask & IN_DELETE) {
+                  log_file = fopen(LOG_FILE, "a+");
+                  fprintf(log_file, "File %s deleted by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                  fclose(log_file);
+              }
+
+              i += EVENT_SIZE + event->len;
+          }
+        }
+    }
+
+    return NULL;
+}
+
+int main() {
+    FILE *systemlogs;
     time_t now;
 
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    backup_time.tm_sec += 30; // TODO: remove
+    backup_time.tm_min += 2; // TODO: remove
     // backup_time.tm_hour = 1; 
     // backup_time.tm_min = 0; 
     // backup_time.tm_sec = 0;
@@ -45,7 +110,7 @@ int main() {
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    check_uploads_time.tm_sec += 15; // TODO: remove
+    check_uploads_time.tm_min += 1; // TODO: remove
     // check_uploads_time.tm_hour = 23; 
     // check_uploads_time.tm_min = 30;
     // check_uploads_time.tm_sec = 0;
@@ -98,18 +163,20 @@ int main() {
                 fclose(systemlogs);
             }
 
-            // Get login name
-            struct passwd *user;
+            // // Get login name
+            // struct passwd *user;
 
-            uid_t uid = getuid();
-            user = getpwuid(uid);
-            if (user == NULL) {
-                perror("getpwuid");
-                exit(1);
-            }
+            // uid_t uid = getuid();
+            // user = getpwuid(uid);
+            // if (user == NULL) {
+            //     perror("getpwuid");
+            //     exit(1);
+            // }
 
-            int length, i = 0;
-            char buffer[EVENT_BUF_LEN];
+            // int length, i = 0;
+            // char buffer[EVENT_BUF_LEN];
+            // time_t event_time;
+            // char *timestamp;
 
             // Inotify file descriptor
             int fd = inotify_init();
@@ -126,49 +193,19 @@ int main() {
               fprintf(systemlogs, "ERROR: daemon.c : inotify_add_watch() failed");
               fclose(systemlogs);
             }
+
+            // Inotify thread
+            pthread_t thread_id;
+            pthread_create(&thread_id, NULL, events_thread, &fd);
 	
             while(1) {
                 sleep(1);
-
-                // Check for events
-                length = read(fd, buffer, EVENT_BUF_LEN);
-                if (length < 0) {
-                    systemlogs = fopen(SYSTEM_LOGS, "a+");
-                    fprintf(systemlogs, "ERROR: daemon.c : read() failed");
-                    fclose(systemlogs);
-                }
-
-                // Process events and log them
-                i = 0;
-                while (i < length) {
-                    struct inotify_event *event = (struct inotify_event *)&buffer[i];
-                    time_t event_time = time(NULL) - (length - i) / (EVENT_SIZE + event->len) - 1;
-                    char *timestamp = ctime(&event_time);
-                    timestamp[strlen(timestamp) - 1] = '\0';
-
-                    if (event->mask & IN_CREATE) {
-                        log_file = fopen(LOG_FILE, "a+");
-                        fprintf(log_file, "File %s created by %s. Time: %s\n", event->name, user->pw_name, timestamp);
-                        fclose(log_file);
-                    }
-                    if (event->mask & IN_DELETE) {
-                        log_file = fopen(LOG_FILE, "a+");
-                        fprintf(log_file, "File %s deleted by %s. Time: %s\n", event->name, user->pw_name, timestamp);
-                        fclose(log_file);
-                    }
-                    if (event->mask & IN_MODIFY) {
-                        log_file = fopen(LOG_FILE, "a+");
-                        fprintf(log_file, "File %s modified by %s. Time: %s\n", event->name, user->pw_name, timestamp);
-                        fclose(log_file);
-                    }
-                    i += EVENT_SIZE + event->len;
-                }
 
                 systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "Daemon is running\n");
                 fclose(systemlogs);
         
-                // Countdown to 23:30
+                // // Countdown to 23:30
                 time(&now);
                 double seconds_to_files_check = abs(difftime(now, mktime(&check_uploads_time)));
 
@@ -176,12 +213,12 @@ int main() {
                 fprintf(systemlogs, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
                 fclose(systemlogs);
 
-                if(seconds_to_files_check == 0) {
+                if (seconds_to_files_check == 0) {
                     check_file_uploads();
                     update_timer(&check_uploads_time); // Reset timer to 23:30
                 }
 
-                // Countdown to 1:00
+                // // Countdown to 1:00
                 time(&now);
                 double seconds_to_transfer = abs(difftime(now, mktime(&backup_time)));
 
@@ -199,6 +236,11 @@ int main() {
                     update_timer(&backup_time); // Reset timer to 1:00
                 }	
             }
+
+            // Remove watch from inotify fd
+            inotify_rm_watch(fd, wd);
+            close(fd);
+            pthread_join(thread_id, NULL);
           }
 
 	      closelog();
