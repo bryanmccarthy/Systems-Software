@@ -10,11 +10,12 @@
 
 void check_file_uploads() {
     FILE *systemlogs;
+    FILE *logfile;
     char *xml_files[] = {"sales", "warehouse", "manufacturing", "distribution"}; // define in daemon_task.h
     int num_xml_files = 4;
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nChecking for file uploads...\n\n");
+    fprintf(systemlogs, "\nChecking for file uploads...\n");
     fclose(systemlogs);
 
     DIR *dir;
@@ -50,17 +51,17 @@ void check_file_uploads() {
     for (int i = 0; i < num_xml_files; i++) {
       if (files_found[i]) {
         // Log file found
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "%s has been uploaded\n", xml_files[i]);
-        fclose(systemlogs);
+        logfile = fopen(LOG_FILE, "a+");
+        fprintf(logfile, "%s has been uploaded\n", xml_files[i]);
+        fclose(logfile);
       } else {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "%s has not been uploaded\n", xml_files[i]);
-        fclose(systemlogs);
+        logfile = fopen(LOG_FILE, "a+");
+        fprintf(logfile, "%s has not been uploaded\n", xml_files[i]);
+        fclose(logfile);
       }
     }
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nDone Checking for file uploads.\n\n");
+    fprintf(systemlogs, "Done Checking for file uploads.\n\n");
     fclose(systemlogs);
 }

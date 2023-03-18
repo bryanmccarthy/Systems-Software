@@ -16,11 +16,11 @@ void backup_dashboard(void) {
     fprintf(systemlogs, "\nBacking up dashboard\n");
     fclose(systemlogs);
 
-    char *backup_dir = BACKUP_DIR;
-    char *reporting_dir = REPORTING_DIR;
+    // char *backup_dir = BACKUP_DIR;
+    // char *reporting_dir = REPORTING_DIR;
 
-    char cp_command[100];
-    snprintf(cp_command, sizeof(cp_command), "cp %s %s", reporting_dir, backup_dir); // TODO: Fix this
+    char cp_command[256];
+    snprintf(cp_command, sizeof(cp_command), "cp -a -u %s/* %s", REPORTING_DIR, BACKUP_DIR); // TODO: Fix this
 
     if (system(cp_command) == -1) {
         systemlogs = fopen(SYSTEM_LOGS, "a+");
