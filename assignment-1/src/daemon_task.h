@@ -1,10 +1,12 @@
 #ifndef DAEMON_TASKS 
 #define DAEMON_TASKS
 
-#define UPLOAD_DIR "/workspaces/Systems-Software/assignment-1/directories/upload_directory"
-#define REPORTING_DIR "/workspaces/Systems-Software/assignment-1/directories/reporting_directory"
-#define DASHBOARD_DIR "/workspaces/Systems-Software/assignment-1/directories/dashboard_directory"
-#define LOG_FILE "/workspaces/Systems-Software/assignment-1/log.txt"
+#define UPLOAD_DIR "/workspaces/Systems-Software/assignment-1/directories/upload_directory/"
+#define REPORTING_DIR "/workspaces/Systems-Software/assignment-1/directories/reporting_directory/"
+#define DASHBOARD_DIR "/workspaces/Systems-Software/assignment-1/directories/dashboard_directory/"
+
+#define LOG_FILE "/workspaces/Systems-Software/assignment-1/logs/log.txt"
+#define SYSTEM_LOGS "/workspaces/Systems-Software/assignment-1/logs/systemlogs.txt"
 
 #include <time.h>
 

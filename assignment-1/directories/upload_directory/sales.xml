@@ -7,5 +7,11 @@
       <quantity>1</quantity>
       <price>1.00</price>
     </sale>
+    <sale>
+      <date>2012-01-01</date>
+      <item>item1</item>
+      <quantity>1</quantity>
+      <price>1.00</price>
+    </sale>
 
 </xml>

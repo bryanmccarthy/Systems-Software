@@ -1,15 +1,15 @@
 #include <unistd.h>
 #include <syslog.h>
-#include "daemon_task.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "daemon_task.h"
 
 void sig_handler(int sigNum) {
     FILE *systemlogs;
 
     if (sigNum == SIGINT) {
-        systemlogs = fopen("systemlogs.txt", "a+");
+        systemlogs = fopen(SYSTEM_LOGS, "a+");
         fprintf(systemlogs, "RECEIVED SIGNAL INTERRUPT, INITIATING BACKUP AND TRANSFER\n");
         fclose(systemlogs);
 

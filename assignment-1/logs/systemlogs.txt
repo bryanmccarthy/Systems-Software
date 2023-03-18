@@ -1,0 +1,50 @@
+auditctl return value: 65280
+Daemon is running
+-14 seconds until check for xml uploads
+-29 seconds until backup
+Daemon is running
+-13 seconds until check for xml uploads
+-28 seconds until backup
+Daemon is running
+-12 seconds until check for xml uploads
+-27 seconds until backup
+Daemon is running
+-11 seconds until check for xml uploads
+-26 seconds until backup
+Daemon is running
+-10 seconds until check for xml uploads
+-25 seconds until backup
+Daemon is running
+-9 seconds until check for xml uploads
+-24 seconds until backup
+Daemon is running
+-8 seconds until check for xml uploads
+-23 seconds until backup
+Daemon is running
+-7 seconds until check for xml uploads
+-22 seconds until backup
+Daemon is running
+-6 seconds until check for xml uploads
+-21 seconds until backup
+Daemon is running
+-5 seconds until check for xml uploads
+-20 seconds until backup
+Daemon is running
+-4 seconds until check for xml uploads
+-19 seconds until backup
+Daemon is running
+-3 seconds until check for xml uploads
+-18 seconds until backup
+Daemon is running
+-2 seconds until check for xml uploads
+-17 seconds until backup
+Daemon is running
+-1 seconds until check for xml uploads
+-16 seconds until backup
+Daemon is running
+0 seconds until check for xml uploads
+
+Checking for file uploads
+Ausearch returned 256
+Done Checking for file uploads
+

@@ -30,7 +30,7 @@ int main() {
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    backup_time.tm_min += 1; // TODO: remove
+    backup_time.tm_sec += 30; // TODO: remove
     // backup_time.tm_hour = 1; 
     // backup_time.tm_min = 0; 
     // backup_time.tm_sec = 0;
@@ -38,7 +38,7 @@ int main() {
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    check_uploads_time.tm_sec += 30; // TODO: remove
+    check_uploads_time.tm_sec += 15; // TODO: remove
     // check_uploads_time.tm_hour = 23; 
     // check_uploads_time.tm_min = 30;
     // check_uploads_time.tm_sec = 0;
@@ -71,8 +71,8 @@ int main() {
             umask(0);
 
             // Change dir to root
-            if (chdir("/workspaces/Systems-Software/assignment-1") < 0) { // TODO: /
-                systemlogs = fopen("systemlogs.txt", "a+");
+            if (chdir("/") < 0) {
+                systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "ERROR: daemon.c : chdir() failed");
                 fclose(systemlogs);
                 exit(EXIT_FAILURE);
@@ -86,20 +86,21 @@ int main() {
 
             // Signal Handler
             if (signal(SIGINT, sig_handler) == SIG_ERR) {
-                systemlogs = fopen("systemlogs.txt", "a+");
+                systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "ERROR: daemon.c : SIG_ERR RECEIVED");
                 fclose(systemlogs);
             }
 
             // Watch UPLOAD_DIR for file changes
-            char audit_watch[256];
-            snprintf(audit_watch, sizeof(audit_watch), "sudo auditctl -w %s -p rwxa -k directory-watch", UPLOAD_DIR);
-            system(audit_watch);
+            int rv = system("sudo auditctl -w " UPLOAD_DIR " -p rwxa -k upload_dir");
+            systemlogs = fopen(SYSTEM_LOGS, "a+");
+            fprintf(systemlogs, "auditctl return value: %d\n", rv);
+            fclose(systemlogs);
 	
             while(1) {
-                sleep(5); // TODO: Change this to 1 second
+                sleep(1); // TODO: Change this to 1 second
 
-                systemlogs = fopen("systemlogs.txt", "a+");
+                systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "Daemon is running\n");
                 fclose(systemlogs);
         
@@ -107,7 +108,7 @@ int main() {
                 time(&now);
                 double seconds_to_files_check = difftime(now, mktime(&check_uploads_time));
 
-                systemlogs = fopen("systemlogs.txt", "a+");
+                systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
                 fclose(systemlogs);
 
@@ -120,7 +121,7 @@ int main() {
                 time(&now);
                 double seconds_to_transfer = difftime(now, mktime(&backup_time));
 
-                systemlogs = fopen("systemlogs.txt", "a+");
+                systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "%.f seconds until backup\n", seconds_to_transfer);
                 fclose(systemlogs);
 
