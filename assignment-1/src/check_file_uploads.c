@@ -14,11 +14,23 @@ void check_file_uploads(void) {
     fprintf(systemlogs, "\nChecking for file uploads\n");
     fclose(systemlogs);
 
-    // Ausearch
-    int rv = system("ausearch -f -k upload_dir " UPLOAD_DIR ">" LOG_FILE);
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Ausearch returned %d\n", rv);
-    fclose(systemlogs);
+    // DIR *dir;
+    // struct dirent *ent;
+
+    // if ((dir = opendir(UPLOAD_DIR)) != NULL) {
+    //     while ((ent = readdir(dir)) != NULL) {
+    //         if (strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0) {
+    //             systemlogs = fopen(SYSTEM_LOGS, "a+");
+    //             fprintf(systemlogs, "Found file: %s\n", ent->d_name);
+    //             fclose(systemlogs);
+    //         }
+    //     }
+    //     closedir(dir);
+    // } else {
+    //     systemlogs = fopen(SYSTEM_LOGS, "a+");
+    //     fprintf(systemlogs, "ERROR: check_file_uploads.c : opendir() failed");
+    //     fclose(systemlogs);
+    // }
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
     fprintf(systemlogs, "Done Checking for file uploads\n\n");

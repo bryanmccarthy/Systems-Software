@@ -22,6 +22,7 @@
 #include <time.h>
 #include "daemon_task.h"
 #include <signal.h>
+#include <sys/inotify.h>
 
 int main() {
     FILE *systemlogs;
@@ -91,11 +92,20 @@ int main() {
                 fclose(systemlogs);
             }
 
-            // Watch UPLOAD_DIR for file changes
-            int rv = system("sudo auditctl -w " UPLOAD_DIR " -p rwxa -k upload_dir");
-            systemlogs = fopen(SYSTEM_LOGS, "a+");
-            fprintf(systemlogs, "auditctl return value: %d\n", rv);
-            fclose(systemlogs);
+            // Watch for changes in the UPLOAD_DIR
+            // int fd = inotify_init();
+            // if (fd < 0) {
+            //   systemlogs = fopen(SYSTEM_LOGS, "a+");
+            //   fprintf(systemlogs, "ERROR: daemon.c : inotify_init() failed");
+            //   fclose(systemlogs);
+            // }
+
+            // int wd = inotify_add_watch(fd, UPLOAD_DIR, IN_MODIFY | IN_CREATE | IN_DELETE);
+            // if (wd < 0) {
+            //   systemlogs = fopen(SYSTEM_LOGS, "a+");
+            //   fprintf(systemlogs, "ERROR: daemon.c : inotify_add_watch() failed");
+            //   fclose(systemlogs);
+            // }
 	
             while(1) {
                 sleep(1); // TODO: Change this to 1 second
