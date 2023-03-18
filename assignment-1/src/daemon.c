@@ -218,7 +218,6 @@ int main() {
                     backup_dashboard();
                     unlock_directories();
                     sleep(10);
-                    generate_reports();
                     update_timer(&backup_time); // Reset timer to 1:00
                 }	
             }
