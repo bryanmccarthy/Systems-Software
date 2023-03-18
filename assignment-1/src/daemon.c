@@ -19,30 +19,36 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <sys/stat.h>
+#include <string.h>
 #include <time.h>
 #include "daemon_task.h"
 #include <signal.h>
 #include <sys/inotify.h>
+#include <pwd.h>
+
+#define EVENT_SIZE (sizeof(struct inotify_event))
+#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
 
 int main() {
     FILE *systemlogs;
+    FILE *log_file;
     time_t now;
 
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    backup_time.tm_sec += 30; // TODO: remove
-    // backup_time.tm_hour = 1; 
-    // backup_time.tm_min = 0; 
-    // backup_time.tm_sec = 0;
+    // backup_time.tm_sec += 30; // TODO: remove
+    backup_time.tm_hour = 1; 
+    backup_time.tm_min = 0; 
+    backup_time.tm_sec = 0;
     
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    check_uploads_time.tm_sec += 15; // TODO: remove
-    // check_uploads_time.tm_hour = 23; 
-    // check_uploads_time.tm_min = 30;
-    // check_uploads_time.tm_sec = 0;
+    // check_uploads_time.tm_sec += 15; // TODO: remove
+    check_uploads_time.tm_hour = 23; 
+    check_uploads_time.tm_min = 30;
+    check_uploads_time.tm_sec = 0;
 
     // Create a child process      
     int pid = fork();
@@ -92,23 +98,68 @@ int main() {
                 fclose(systemlogs);
             }
 
-            // Watch for changes in the UPLOAD_DIR
-            // int fd = inotify_init();
-            // if (fd < 0) {
-            //   systemlogs = fopen(SYSTEM_LOGS, "a+");
-            //   fprintf(systemlogs, "ERROR: daemon.c : inotify_init() failed");
-            //   fclose(systemlogs);
-            // }
+            // Get login name
+            struct passwd *user;
 
-            // int wd = inotify_add_watch(fd, UPLOAD_DIR, IN_MODIFY | IN_CREATE | IN_DELETE);
-            // if (wd < 0) {
-            //   systemlogs = fopen(SYSTEM_LOGS, "a+");
-            //   fprintf(systemlogs, "ERROR: daemon.c : inotify_add_watch() failed");
-            //   fclose(systemlogs);
-            // }
+            uid_t uid = getuid();
+            user = getpwuid(uid);
+            if (user == NULL) {
+                perror("getpwuid");
+                exit(1);
+            }
+
+            int length, i = 0;
+            char buffer[EVENT_BUF_LEN];
+
+            // Watch for changes in the UPLOAD_DIR
+            int fd = inotify_init();
+            if (fd < 0) {
+              systemlogs = fopen(SYSTEM_LOGS, "a+");
+              fprintf(systemlogs, "ERROR: daemon.c : inotify_init() failed");
+              fclose(systemlogs);
+            }
+
+            int wd = inotify_add_watch(fd, UPLOAD_DIR, IN_ALL_EVENTS);
+            if (wd < 0) {
+              systemlogs = fopen(SYSTEM_LOGS, "a+");
+              fprintf(systemlogs, "ERROR: daemon.c : inotify_add_watch() failed");
+              fclose(systemlogs);
+            }
 	
             while(1) {
-                sleep(1); // TODO: Change this to 1 second
+                sleep(1);
+
+                length = read(fd, buffer, EVENT_BUF_LEN);
+                if (length < 0) {
+                    systemlogs = fopen(SYSTEM_LOGS, "a+");
+                    fprintf(systemlogs, "ERROR: daemon.c : read() failed");
+                    fclose(systemlogs);
+                }
+
+                i = 0;
+                while (i < length) {
+                    struct inotify_event *event = (struct inotify_event *)&buffer[i];
+                    time_t event_time = time(NULL) - (length - i) / (EVENT_SIZE + event->len) - 1;
+                    char *timestamp = ctime(&event_time);
+                    timestamp[strlen(timestamp) - 1] = '\0';
+
+                    if (event->mask & IN_CREATE) {
+                        log_file = fopen(LOG_FILE, "a+");
+                        fprintf(log_file, "File %s created by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                        fclose(log_file);
+                    }
+                    if (event->mask & IN_DELETE) {
+                        log_file = fopen(LOG_FILE, "a+");
+                        fprintf(log_file, "File %s deleted by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                        fclose(log_file);
+                    }
+                    if (event->mask & IN_MODIFY) {
+                        log_file = fopen(LOG_FILE, "a+");
+                        fprintf(log_file, "File %s modified by %s. Time: %s\n", event->name, user->pw_name, timestamp);
+                        fclose(log_file);
+                    }
+                    i += EVENT_SIZE + event->len;
+                }
 
                 systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "Daemon is running\n");

@@ -1,0 +1,21 @@
+<xml>
+
+  <warehouse>
+    <item>
+      <name>item1</name>
+      <quantity>1</quantity>
+      <price>1.00</price>
+    </item>
+    <item>
+      <name>item2</name>
+      <quantity>1</quantity>
+      <price>1.00</price>
+    </item>
+    <item>
+      <name>item3</name>
+      <quantity>1</quantity>
+      <price>1.00</price>
+    </item>
+  </warehouse>
+
+</xml>
