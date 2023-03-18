@@ -120,7 +120,6 @@ int main() {
  
     if (pid > 0) {
         printf("Parent process: %d\n", getpid());
-        sleep(3);
         exit(EXIT_SUCCESS);
     } else if (pid == 0) {
         // Child process
@@ -137,6 +136,7 @@ int main() {
             printf("Parent process: %d\n", getpid());
             exit(EXIT_SUCCESS);
         } else {
+            // Child process
             printf("Forked again: Child process: %d, Childs parent: %d\n", getpid(), getppid());
 
             // Set the file mode creation mask to 0
