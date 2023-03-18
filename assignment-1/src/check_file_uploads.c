@@ -42,28 +42,22 @@ void check_file_uploads() {
               files_found[i] = 1; // Set file to found
           }
       }
-
-      // Move entry to reporting directory
-      char *old_path = malloc(strlen(UPLOAD_DIR) + strlen(entry->d_name) + 1);
-      strcpy(old_path, UPLOAD_DIR);
-      strcat(old_path, entry->d_name);
-      char *new_path = malloc(strlen(REPORTING_DIR) + strlen(entry->d_name) + 1);
-      strcpy(new_path, REPORTING_DIR);
-      strcat(new_path, entry->d_name);
-      rename(old_path, new_path);
-      free(old_path);
-      free(new_path);
     }
 
     closedir(dir); // Close the upload directory
 
-    // Log files that were not found
+    // Log files that were found or not found
     for (int i = 0; i < num_xml_files; i++) {
-      if (!files_found[i]) {
+      if (files_found[i]) {
+        // Log file found
         systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "File %s not found\n", xml_files[i]);
+        fprintf(systemlogs, "%s has been uploaded\n", xml_files[i]);
         fclose(systemlogs);
-      } 
+      } else {
+        systemlogs = fopen(SYSTEM_LOGS, "a+");
+        fprintf(systemlogs, "%s has not been uploaded\n", xml_files[i]);
+        fclose(systemlogs);
+      }
     }
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");

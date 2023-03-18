@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xml>
+
+  <distribution>
+    <item>
+      <name>item1</name>
+      <quantity>1</quantity>
+      <price>1.00</price>
+    </item>
+    <item>
+    <name>item2</name>
+    <quantity>1</quantity>
+    <price>1.00</price>
+    </item>
+  </distribution>
+
+</xml>

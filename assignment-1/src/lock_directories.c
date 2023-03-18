@@ -23,8 +23,8 @@ void lock_directories() {
         fclose(systemlogs);
     }
 
-    int fd2 = open(REPORTING_DIR, O_RDONLY);
-    if (fd2 == -1) {
+    int reporting_fd = open(REPORTING_DIR, O_RDONLY);
+    if (reporting_fd == -1) {
         systemlogs = fopen(SYSTEM_LOGS, "a+");
         fprintf(systemlogs, "Error opening directory: %s\n", REPORTING_DIR);
         fclose(systemlogs);
@@ -36,20 +36,18 @@ void lock_directories() {
         fprintf(systemlogs, "Failed to acquire lock on upload directory\n");
         fclose(systemlogs);
         close(upload_fd);
-        close(fd2);
+        close(reporting_fd);
     }
 
-    if (flock(fd2, LOCK_EX) == -1) {
+    if (flock(reporting_fd, LOCK_EX) == -1) {
         systemlogs = fopen(SYSTEM_LOGS, "a+");
         fprintf(systemlogs, "Failed to acquire lock on reporting directory\n");
         fclose(systemlogs);
         close(upload_fd);
-        close(fd2);
+        close(reporting_fd);
     }
 
     systemlogs = fopen(SYSTEM_LOGS, "a+");
     fprintf(systemlogs, "Directories locked\n");
     fclose(systemlogs);
-
-    sleep(20); // Sleep for 20 seconds
 }

@@ -102,7 +102,7 @@ int main() {
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    backup_time.tm_min += 2; // TODO: remove
+    backup_time.tm_sec += 30; // TODO: remove
     // backup_time.tm_hour = 1; 
     // backup_time.tm_min = 0; 
     // backup_time.tm_sec = 0;
@@ -110,7 +110,7 @@ int main() {
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    check_uploads_time.tm_min += 1; // TODO: remove
+    check_uploads_time.tm_sec += 20; // TODO: remove
     // check_uploads_time.tm_hour = 23; 
     // check_uploads_time.tm_min = 30;
     // check_uploads_time.tm_sec = 0;
@@ -230,7 +230,7 @@ int main() {
                     lock_directories();
                     collect_reports();	  
                     backup_dashboard();
-                    sleep(30);
+                    sleep(20);
                     unlock_directories();
                     generate_reports();
                     update_timer(&backup_time); // Reset timer to 1:00

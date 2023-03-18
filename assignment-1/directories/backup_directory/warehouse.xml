@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xml>
 
-<manufacturing>
-  <item>
+  <warehouse>
+    <item>
       <name>item1</name>
       <quantity>1</quantity>
       <price>1.00</price>
@@ -11,11 +13,6 @@
       <quantity>1</quantity>
       <price>1.00</price>
     </item>
-    <item>
-      <name>item3</name>
-      <quantity>1</quantity>
-      <price>1.00</price>
-    </item>
-</manufacturing>
+  </warehouse>
 
 </xml>
