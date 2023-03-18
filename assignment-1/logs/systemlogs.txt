@@ -1,1 +1,17 @@
+Daemon is running
+-13 seconds until check for xml uploads
 
+Checking for file uploads
+File manufacturing not found
+File distribution not found
+Done Checking for file uploads
+
+Current day is 18; changing timer to tommorow's date
+Timer updated to tommorow's date: 19
+-8 seconds until backup
+Daemon is running
+-86392 seconds until check for xml uploads
+
+Checking for file uploads
+File sales not found
+File warehouse not found

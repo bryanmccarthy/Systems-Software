@@ -37,18 +37,18 @@ int main() {
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    // backup_time.tm_sec += 30; // TODO: remove
-    backup_time.tm_hour = 1; 
-    backup_time.tm_min = 0; 
-    backup_time.tm_sec = 0;
+    backup_time.tm_sec += 30; // TODO: remove
+    // backup_time.tm_hour = 1; 
+    // backup_time.tm_min = 0; 
+    // backup_time.tm_sec = 0;
     
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    // check_uploads_time.tm_sec += 15; // TODO: remove
-    check_uploads_time.tm_hour = 23; 
-    check_uploads_time.tm_min = 30;
-    check_uploads_time.tm_sec = 0;
+    check_uploads_time.tm_sec += 15; // TODO: remove
+    // check_uploads_time.tm_hour = 23; 
+    // check_uploads_time.tm_min = 30;
+    // check_uploads_time.tm_sec = 0;
 
     // Create a child process      
     int pid = fork();
@@ -111,7 +111,7 @@ int main() {
             int length, i = 0;
             char buffer[EVENT_BUF_LEN];
 
-            // Watch for changes in the UPLOAD_DIR
+            // Inotify file descriptor
             int fd = inotify_init();
             if (fd < 0) {
               systemlogs = fopen(SYSTEM_LOGS, "a+");
@@ -119,6 +119,7 @@ int main() {
               fclose(systemlogs);
             }
 
+            // Add watch to inotify file descriptor
             int wd = inotify_add_watch(fd, UPLOAD_DIR, IN_ALL_EVENTS);
             if (wd < 0) {
               systemlogs = fopen(SYSTEM_LOGS, "a+");
@@ -129,6 +130,7 @@ int main() {
             while(1) {
                 sleep(1);
 
+                // Check for events
                 length = read(fd, buffer, EVENT_BUF_LEN);
                 if (length < 0) {
                     systemlogs = fopen(SYSTEM_LOGS, "a+");
@@ -136,6 +138,7 @@ int main() {
                     fclose(systemlogs);
                 }
 
+                // Process events and log them
                 i = 0;
                 while (i < length) {
                     struct inotify_event *event = (struct inotify_event *)&buffer[i];
@@ -167,7 +170,7 @@ int main() {
         
                 // Countdown to 23:30
                 time(&now);
-                double seconds_to_files_check = difftime(now, mktime(&check_uploads_time));
+                double seconds_to_files_check = abs(difftime(now, mktime(&check_uploads_time)));
 
                 systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
@@ -180,7 +183,7 @@ int main() {
 
                 // Countdown to 1:00
                 time(&now);
-                double seconds_to_transfer = difftime(now, mktime(&backup_time));
+                double seconds_to_transfer = abs(difftime(now, mktime(&backup_time)));
 
                 systemlogs = fopen(SYSTEM_LOGS, "a+");
                 fprintf(systemlogs, "%.f seconds until backup\n", seconds_to_transfer);
