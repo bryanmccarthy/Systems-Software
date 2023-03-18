@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <syslog.h>
 #include <dirent.h>
 #include <string.h>
 #include <time.h>
@@ -9,14 +10,11 @@
 #include <dirent.h>
 
 void check_file_uploads() {
-    FILE *systemlogs;
     FILE *logfile;
     char *xml_files[] = {"sales", "warehouse", "manufacturing", "distribution"}; // define in daemon_task.h
     int num_xml_files = 4;
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nChecking for file uploads...\n");
-    fclose(systemlogs);
+   
+    syslog(LOG_INFO, "Checking for file uploads");
 
     DIR *dir;
     struct dirent *entry;
@@ -30,9 +28,7 @@ void check_file_uploads() {
     // Open the upload directory
     dir = opendir(UPLOAD_DIR);
     if (dir == NULL) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Error opening directory: %s\n", UPLOAD_DIR);
-        fclose(systemlogs);
+        syslog(LOG_ERR, "Error opening directory: %s\n", UPLOAD_DIR);
         return;
     }
 
@@ -60,8 +56,4 @@ void check_file_uploads() {
         fclose(logfile);
       }
     }
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Done Checking for file uploads.\n\n");
-    fclose(systemlogs);
 }

@@ -10,12 +10,9 @@
 #include <stdlib.h>
 
 void unlock_directories() {
-    FILE *systemlogs;
-    char *unlock_permissions = "755";
+    syslog(LOG_INFO, "Unlocking directories");
 
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nUnlocking directories\n");
-    fclose(systemlogs);
+    char *unlock_permissions = "755";
 
     // Unlock the upload and reporting directories
     char unlock_upload[100];
@@ -26,8 +23,4 @@ void unlock_directories() {
 
     system(unlock_upload);
     system(unlock_reporting);
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Directories unlocked\n\n");
-    fclose(systemlogs);
 }

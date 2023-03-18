@@ -6,12 +6,8 @@
 #include "daemon_task.h"
 
 void sig_handler(int sigNum) {
-    FILE *systemlogs;
-
     if (sigNum == SIGINT) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "RECEIVED SIGNAL INTERRUPT, INITIATING BACKUP AND TRANSFER\n");
-        fclose(systemlogs);
+        syslog(LOG_INFO, "RECEIVED SIGNAL INTERRUPT, INITIATING BACKUP AND TRANSFER");
 
         lock_directories();
         collect_reports();

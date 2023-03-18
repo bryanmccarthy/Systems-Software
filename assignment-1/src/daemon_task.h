@@ -6,7 +6,6 @@
 #define BACKUP_DIR "/workspaces/Systems-Software/assignment-1/directories/backup_directory/"
 
 #define LOG_FILE "/workspaces/Systems-Software/assignment-1/logs/log.txt"
-#define SYSTEM_LOGS "/workspaces/Systems-Software/assignment-1/logs/systemlogs.txt"
 
 #include <time.h>
 

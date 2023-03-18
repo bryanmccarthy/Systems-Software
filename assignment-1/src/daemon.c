@@ -32,7 +32,6 @@
 
 // Thread for logging inotify events
 void *events_thread(void *arg) {
-    FILE *systemlogs;
     FILE *log_file;
 
     int fd = *(int *) arg;
@@ -48,17 +47,11 @@ void *events_thread(void *arg) {
 
     while(1) {
         sleep(1);
-        // Log inside inotify thread
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Inotify thread running\n");
-        fclose(systemlogs);
 
         // Check for events
         length = read(fd, buffer, EVENT_BUF_LEN);
         if (length < 0) {
-            systemlogs = fopen(SYSTEM_LOGS, "a+");
-            fprintf(systemlogs, "ERROR: daemon.c : read() failed");
-            fclose(systemlogs);
+            syslog(LOG_ERR, "ERROR: daemon.c : read() failed");
         }
 
         // Process events and log them
@@ -96,7 +89,6 @@ void *events_thread(void *arg) {
 }
 
 int main() {
-    FILE *systemlogs;
     time_t now;
 
     struct tm backup_time;
@@ -144,9 +136,7 @@ int main() {
 
             // Change dir to root
             if (chdir("/") < 0) {
-                systemlogs = fopen(SYSTEM_LOGS, "a+");
-                fprintf(systemlogs, "ERROR: daemon.c : chdir() failed");
-                fclose(systemlogs);
+                syslog(LOG_ERR, "ERROR: daemon.c : chdir() failed");
                 exit(EXIT_FAILURE);
             }
 
@@ -158,25 +148,19 @@ int main() {
 
             // Signal Handler
             if (signal(SIGINT, sig_handler) == SIG_ERR) {
-                systemlogs = fopen(SYSTEM_LOGS, "a+");
-                fprintf(systemlogs, "ERROR: daemon.c : SIG_ERR RECEIVED");
-                fclose(systemlogs);
+                syslog(LOG_ERR, "ERROR: daemon.c : SIG_ERR RECEIVED");
             }
 
             // Inotify file descriptor
             int fd = inotify_init();
             if (fd < 0) {
-              systemlogs = fopen(SYSTEM_LOGS, "a+");
-              fprintf(systemlogs, "ERROR: daemon.c : inotify_init() failed");
-              fclose(systemlogs);
+              syslog(LOG_ERR, "ERROR: daemon.c : inotify_init() failed");
             }
 
             // Add watch to inotify file descriptor
             int wd = inotify_add_watch(fd, UPLOAD_DIR, IN_ALL_EVENTS);
             if (wd < 0) {
-              systemlogs = fopen(SYSTEM_LOGS, "a+");
-              fprintf(systemlogs, "ERROR: daemon.c : inotify_add_watch() failed");
-              fclose(systemlogs);
+              syslog(LOG_ERR, "ERROR: daemon.c : inotify_add_watch() failed");
             }
 
             // Inotify thread
@@ -185,31 +169,21 @@ int main() {
 	
             while(1) {
                 sleep(1);
-
-                systemlogs = fopen(SYSTEM_LOGS, "a+");
-                fprintf(systemlogs, "Daemon is running\n");
-                fclose(systemlogs);
         
-                // // Countdown to 23:30
+                // Countdown to 23:30
                 time(&now);
                 double seconds_to_files_check = abs(difftime(now, mktime(&check_uploads_time)));
-
-                systemlogs = fopen(SYSTEM_LOGS, "a+");
-                fprintf(systemlogs, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
-                fclose(systemlogs);
+                // syslog(LOG_INFO, "%.f seconds until check for xml uploads\n", seconds_to_files_check); // TODO: uncomment
 
                 if (seconds_to_files_check == 0) {
                     check_file_uploads();
                     update_timer(&check_uploads_time); // Reset timer to 23:30
                 }
 
-                // // Countdown to 1:00
+                // Countdown to 1:00
                 time(&now);
                 double seconds_to_transfer = abs(difftime(now, mktime(&backup_time)));
-
-                systemlogs = fopen(SYSTEM_LOGS, "a+");
-                fprintf(systemlogs, "%.f seconds until backup\n", seconds_to_transfer);
-                fclose(systemlogs);
+                // syslog(LOG_INFO, "%.f seconds until backup\n", seconds_to_transfer); // TODO: uncomment
 
                 if(seconds_to_transfer == 0) {
                     lock_directories();

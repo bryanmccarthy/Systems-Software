@@ -10,11 +10,7 @@
 #include <string.h>
 
 void collect_reports(void) {
-    FILE *systemlogs;
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nCollecting reports...\n");
-    fclose(systemlogs);
+    syslog(LOG_INFO, "Collecting reports");
 
     DIR *dir;
     struct dirent *ent;
@@ -22,9 +18,7 @@ void collect_reports(void) {
     // Open the upload directory
     dir = opendir(UPLOAD_DIR);
     if (dir == NULL) {
-        systemlogs = fopen(SYSTEM_LOGS, "a+");
-        fprintf(systemlogs, "Error opening directory: %s\n", UPLOAD_DIR);
-        fclose(systemlogs);
+        syslog(LOG_ERR, "Error opening directory: %s", UPLOAD_DIR);
         return;
     }
 
@@ -40,17 +34,9 @@ void collect_reports(void) {
 
       rename(old_path, new_path); // Move file
 
-      systemlogs = fopen(SYSTEM_LOGS, "a+");
-      fprintf(systemlogs, "(Moved %s to %s)\n", old_path, new_path);
-      fclose(systemlogs);
-
       free(old_path);
       free(new_path);
     }
 
     closedir(dir); // Close the upload directory
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Done collecting reports.\n\n");
-    fclose(systemlogs);
 }

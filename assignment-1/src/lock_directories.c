@@ -10,13 +10,11 @@
 #include <stdlib.h>
 
 void lock_directories() {
-    FILE *systemlogs;
+    syslog(LOG_INFO, "Locking directories");
+
+    // Lock chmod permissions mode
     char *lock_permissions = "777";
 
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "\nLocking directories...\n");
-    fclose(systemlogs);
-    
     // Lock the upload and reporting directories
     char lock_upload[100];
     char lock_reporting[100];
@@ -26,8 +24,4 @@ void lock_directories() {
 
     system(lock_upload);
     system(lock_reporting);
-
-    systemlogs = fopen(SYSTEM_LOGS, "a+");
-    fprintf(systemlogs, "Directories locked.\n");
-    fclose(systemlogs);
 }
