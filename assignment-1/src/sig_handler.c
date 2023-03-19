@@ -11,6 +11,7 @@ void sig_handler(int sigNum) {
 
         lock_directories();
         collect_reports();
+        sleep(15);
         backup_dashboard();
         sleep(30);
         unlock_directories();	

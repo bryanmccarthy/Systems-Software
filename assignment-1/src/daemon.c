@@ -94,18 +94,16 @@ int main() {
     struct tm backup_time;
     time(&now);
     backup_time = *localtime(&now);
-    backup_time.tm_sec += 50; // TODO: remove
-    // backup_time.tm_hour = 1; 
-    // backup_time.tm_min = 0; 
-    // backup_time.tm_sec = 0;
+    backup_time.tm_hour = 1; 
+    backup_time.tm_min = 0; 
+    backup_time.tm_sec = 0;
     
     struct tm check_uploads_time;
     time(&now);
     check_uploads_time = *localtime(&now);
-    check_uploads_time.tm_sec += 35; // TODO: remove
-    // check_uploads_time.tm_hour = 23; 
-    // check_uploads_time.tm_min = 30;
-    // check_uploads_time.tm_sec = 0;
+    check_uploads_time.tm_hour = 23; 
+    check_uploads_time.tm_min = 30;
+    check_uploads_time.tm_sec = 0;
 
     // Create a child process      
     int pid = fork();
@@ -173,7 +171,7 @@ int main() {
                 // Countdown to 23:30
                 time(&now);
                 double seconds_to_files_check = abs(difftime(now, mktime(&check_uploads_time)));
-                // syslog(LOG_INFO, "%.f seconds until check for xml uploads\n", seconds_to_files_check); // TODO: uncomment
+                syslog(LOG_INFO, "%.f seconds until check for xml uploads\n", seconds_to_files_check);
 
                 if (seconds_to_files_check == 0) {
                     check_file_uploads();
@@ -183,15 +181,15 @@ int main() {
                 // Countdown to 1:00
                 time(&now);
                 double seconds_to_transfer = abs(difftime(now, mktime(&backup_time)));
-                // syslog(LOG_INFO, "%.f seconds until backup\n", seconds_to_transfer); // TODO: uncomment
+                syslog(LOG_INFO, "%.f seconds until backup\n", seconds_to_transfer);
 
                 if(seconds_to_transfer == 0) {
                     lock_directories();
                     collect_reports();
-                    sleep(10); 
+                    sleep(15); 
                     backup_dashboard();
+                    sleep(30);
                     unlock_directories();
-                    sleep(10);
                     update_timer(&backup_time); // Reset timer to 1:00
                 }	
             }

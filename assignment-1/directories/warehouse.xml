@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xml>
-  <manufacturing>
+  <warehouse>
     <item>
       <name>item1</name>
     </item>
     <item>
       <name>item2</name>
     </item>
-  </manufacturing>
+    <item>
+      <name>item3</name>
+    </item>
+  </warehouse>
 </xml>

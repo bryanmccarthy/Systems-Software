@@ -13,7 +13,7 @@ void backup_dashboard(void) {
     syslog(LOG_INFO, "Backing up dashboard");
 
     char cp_command[256];
-    snprintf(cp_command, sizeof(cp_command), "cp -a -u %s/* %s", REPORTING_DIR, BACKUP_DIR); // TODO: Fix this
+    snprintf(cp_command, sizeof(cp_command), "cp -a %s/* %s", REPORTING_DIR, BACKUP_DIR);
 
     if (system(cp_command) == -1) {
         syslog(LOG_ERR, "Error backing up dashboard\n");

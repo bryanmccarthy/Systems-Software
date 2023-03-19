@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xml>
-  <warehouse>
+  <distribution>
     <item>
       <name>item1</name>
     </item>
@@ -11,5 +11,8 @@
     <item>
       <name>item2</name>
     </item>
-  </warehouse>
+    <item>
+      <name>item2</name>
+    </item>
+  </distribution>
 </xml>
