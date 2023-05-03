@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serv_addr;
   char buffer[1024] = {0};
   int menu_choice;
-  char *transfer = "transfer";
+  char file_path[100];
+  char file_name[100];
   int ngroups;
   gid_t *groups;
 
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
   free(groups);
 
   // Create socket file descriptor
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+  if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     printf("\n Socket creation error \n");
     return -1;
   }
@@ -63,36 +64,72 @@ int main(int argc, char *argv[]) {
   serv_addr.sin_port = htons(PORT);
 
   // Connect to server
-  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+  if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     printf("\nConnection Failed \n");
     return -1;
   }
 
   while(1) {
+    printf("\nMenu:");
     printf("\n1: Transfer file \n2: Exit \n");
     scanf("%d", &menu_choice);
 
     switch(menu_choice) {
       case 1:
+        printf("\nSelect department:");
         printf("\n1: Manufacturing \n2: Distribution \n");
         scanf("%d", &menu_choice);
 
         switch(menu_choice) {
           case 1:
-            if (!is_manufacturing) {
+            if(!is_manufacturing) {
               printf("You are not in the manufacturing department\n");
               break;
             }
 
             send(sock, "manufacturing", strlen("manufacturing"), 0);
+            
+            // Get file path
+            printf("Enter file path: ");
+            scanf("%s", file_path);
+
+            // Get file name
+            printf("Enter file name: ");
+            scanf("%s", file_name);
+
+            if(access(file_path, F_OK) == -1) {
+              printf("File does not exist\n");
+              break;
+            }
+
+            // Send transfer command to server
+            send(sock, "transfer", strlen("transfer"), 0);
+            sleep(1);
+
+            // Send file name to server
+            send(sock, file_name, strlen(file_name), 0);
+            sleep(1);
+
+            // Open file
+            FILE *fp = fopen(file_path, "r");
+
+            // Send file contents to server
+            while(fgets(buffer, 1024, fp) != NULL) {
+              send(sock, buffer, strlen(buffer), 0);
+              memset(buffer, 0, 1024);
+            }
+
+            // Close file
+            fclose(fp);
             break;
           case 2:
-            if (!is_distribution) {
+            if(!is_distribution) {
               printf("You are not in the distribution department\n");
               break;
             }
 
             send(sock, "distribution", strlen("distribution"), 0);
+
             break;
           default:
             printf("invalid choice\n");

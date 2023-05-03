@@ -13,6 +13,8 @@ void *handle_client(void *arg) {
   int client_fd = *(int *)arg;
   char buffer[1024] = {0};
   int valread;
+  // department
+  char department[20] = {0};
 
   while(1) {
 
@@ -24,8 +26,53 @@ void *handle_client(void *arg) {
 
     printf("Message from client: %s\n", buffer);
 
-    if (strcmp(buffer, "exit") == 0) {
+    if(strcmp(buffer, "exit") == 0) {
       break;
+    }
+
+    // if buffer = "manufacturing" 
+    if(strcmp(buffer, "manufacturing") == 0) {
+      strcpy(department, "manufacturing");
+    }
+
+    // if buffer = "distribution"
+    if(strcmp(buffer, "distribution") == 0) {
+      strcpy(department, "distribution");
+    }
+
+    if(strcmp(buffer, "transfer") == 0) {
+      printf("\n%s transfer started\n", department);
+
+      // Get file name
+      valread = read(client_fd, buffer, 1024);
+      if (valread == 0) {
+        break;
+      }
+
+      printf("File name: %s\n", buffer);
+
+      // Create file in department directory
+      char file_path[100] = {0};
+      sprintf(file_path, "%s/%s", department, buffer);
+      FILE *fp = fopen(file_path, "w");
+      if(fp == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+      }
+
+      // Get file contents
+      valread = read(client_fd, buffer, 1024);
+      if (valread == 0) {
+        break;
+      }
+
+      // Write file contents to file
+      fprintf(fp, "%s", buffer);
+
+      // Close file
+      fclose(fp);
+
+      printf("Transfer complete\n");
     }
 
     memset(buffer, 0, 1024);
@@ -44,13 +91,13 @@ int main(int argc, char *argv[]) {
   char buffer[1024] = {0};
 
   // Create socket file descriptor
-  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+  if((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
     perror("socket failed");
     exit(EXIT_FAILURE);
   }
 
   // Attach socket to port 8080
-  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt))) {
+  if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt))) {
     perror("setsockopt");
     exit(EXIT_FAILURE);
   }
@@ -65,13 +112,13 @@ int main(int argc, char *argv[]) {
   address.sin_port = htons(PORT);
 
   // Bind socket to address and port
-  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+  if(bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
     perror("bind failed");
     exit(EXIT_FAILURE);
   }
 
   // Listen for connections
-  if (listen(server_fd, 3) < 0) {
+  if(listen(server_fd, 3) < 0) {
     perror("listen failed");
     exit(EXIT_FAILURE);
   }
@@ -79,11 +126,11 @@ int main(int argc, char *argv[]) {
   printf("Listening on port %d\n", PORT);
 
   // Server loop
-  while (1) {
+  while(1) {
 
     printf("Waiting for connection...\n");
 
-    if ((client_fd = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+    if((client_fd = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
       perror("accept failed");
       exit(EXIT_FAILURE);
     }
@@ -92,7 +139,7 @@ int main(int argc, char *argv[]) {
     
     // Create thread to handle client
     pthread_t thread;
-    if (pthread_create(&thread, NULL, handle_client, (void *)&client_fd) < 0) {
+    if(pthread_create(&thread, NULL, handle_client, (void *)&client_fd) < 0) {
       perror("pthread_create failed");
       exit(EXIT_FAILURE);
     }
