@@ -11,9 +11,9 @@ int main(int argc, char *argv[]) {
   
   int sock = 0, valread;
   struct sockaddr_in serv_addr;
-  char *hello = "Hello from client";
   char buffer[1024] = {0};
   int menu_choice;
+  char *transfer = "transfer";
 
   // Create socket file descriptor
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -40,8 +40,7 @@ int main(int argc, char *argv[]) {
 
     switch(menu_choice) {
       case 1:
-        printf("sending msg\n");
-        send(sock, hello, strlen(hello), 0);
+        send(sock, transfer, strlen(transfer), 0);
         break;
       case 2:
         printf("exiting\n");

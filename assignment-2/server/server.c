@@ -4,8 +4,24 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <pthread.h>
 
 #define PORT 8080
+
+void *handle_client(void *arg) {
+
+  int client_fd = *(int *)arg;
+  char buffer[1024] = {0};
+  int valread;
+
+  // Read from client
+  valread = read(client_fd, buffer, 1024);
+  printf("Message from client: %s\n", buffer);
+
+  close(client_fd);
+
+  return NULL;
+}
 
 int main(int argc, char *argv[]) {
   
@@ -47,6 +63,8 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  printf("Listening on port %d\n", PORT);
+
   // Server loop
   while (1) {
 
@@ -57,11 +75,12 @@ int main(int argc, char *argv[]) {
 
     printf("Connection made, client address: %s\n", inet_ntoa(address.sin_addr));
     
-    // Read from client
-    read(client_fd, buffer, 1024);
-
-    printf("Message from client: %s\n", buffer);
-    
+    // Create thread to handle client
+    pthread_t thread;
+    if (pthread_create(&thread, NULL, handle_client, (void *)&client_fd) < 0) {
+      perror("pthread_create failed");
+      exit(EXIT_FAILURE);
+    }
   }
   
   close(client_fd);
