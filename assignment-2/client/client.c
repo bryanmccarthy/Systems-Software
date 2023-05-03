@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <grp.h>
+#include <stdbool.h>
 
 #define PORT 8080
 
@@ -14,6 +16,38 @@ int main(int argc, char *argv[]) {
   char buffer[1024] = {0};
   int menu_choice;
   char *transfer = "transfer";
+  int ngroups;
+  gid_t *groups;
+
+  char *username = getlogin();
+  char uid = getuid();
+  char departments[2][20] = {"manufacturing", "distribution"};
+  bool is_manufacturing = false;
+  bool is_distribution = false;
+
+  // Get number of groups
+  ngroups = getgroups(0, NULL);
+
+  // Allocate memory for groups
+  groups = malloc(ngroups * sizeof(gid_t));
+
+  // Get groups
+  getgroups(ngroups, groups);
+
+  // Check if user is in manufacturing or distribution group
+  for (int i = 0; i < ngroups; i++) {
+    struct group *grp = getgrgid(groups[i]);
+
+    if (strcmp(grp->gr_name, departments[0]) == 0) {
+      is_manufacturing = true;
+    }
+
+    if (strcmp(grp->gr_name, departments[1]) == 0) {
+      is_distribution = true;
+    }
+  }
+
+  free(groups);
 
   // Create socket file descriptor
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -45,9 +79,19 @@ int main(int argc, char *argv[]) {
 
         switch(menu_choice) {
           case 1:
+            if (!is_manufacturing) {
+              printf("You are not in the manufacturing department\n");
+              break;
+            }
+
             send(sock, "manufacturing", strlen("manufacturing"), 0);
             break;
           case 2:
+            if (!is_distribution) {
+              printf("You are not in the distribution department\n");
+              break;
+            }
+
             send(sock, "distribution", strlen("distribution"), 0);
             break;
           default:
