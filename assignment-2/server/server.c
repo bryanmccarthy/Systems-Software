@@ -14,9 +14,22 @@ void *handle_client(void *arg) {
   char buffer[1024] = {0};
   int valread;
 
-  // Read from client
-  valread = read(client_fd, buffer, 1024);
-  printf("Message from client: %s\n", buffer);
+  while(1) {
+
+    valread = read(client_fd, buffer, 1024);
+
+    if (valread == 0) {
+      break;
+    }
+
+    printf("Message from client: %s\n", buffer);
+
+    if (strcmp(buffer, "exit") == 0) {
+      break;
+    }
+
+    memset(buffer, 0, 1024);
+  }
 
   close(client_fd);
 
@@ -67,6 +80,8 @@ int main(int argc, char *argv[]) {
 
   // Server loop
   while (1) {
+
+    printf("Waiting for connection...\n");
 
     if ((client_fd = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
       perror("accept failed");

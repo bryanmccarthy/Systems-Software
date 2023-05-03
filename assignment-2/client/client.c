@@ -40,11 +40,27 @@ int main(int argc, char *argv[]) {
 
     switch(menu_choice) {
       case 1:
-        send(sock, transfer, strlen(transfer), 0);
+        printf("\n1: Manufacturing \n2: Distribution \n");
+        scanf("%d", &menu_choice);
+
+        switch(menu_choice) {
+          case 1:
+            send(sock, "manufacturing", strlen("manufacturing"), 0);
+            break;
+          case 2:
+            send(sock, "distribution", strlen("distribution"), 0);
+            break;
+          default:
+            printf("invalid choice\n");
+        }
+
         break;
+
       case 2:
         printf("exiting\n");
+        send(sock, "exit", strlen("exit"), 0);
         exit(0);
+
       default:
         printf("invalid choice\n");
     }
