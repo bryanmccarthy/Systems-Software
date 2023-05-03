@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serv_addr;
   char *hello = "Hello from client";
   char buffer[1024] = {0};
+  int menu_choice;
 
   // Create socket file descriptor
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -31,6 +32,23 @@ int main(int argc, char *argv[]) {
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     printf("\nConnection Failed \n");
     return -1;
+  }
+
+  while(1) {
+    printf("\n1: Transfer file \n2: Exit \n");
+    scanf("%d", &menu_choice);
+
+    switch(menu_choice) {
+      case 1:
+        printf("sending msg\n");
+        send(sock, hello, strlen(hello), 0);
+        break;
+      case 2:
+        printf("exiting\n");
+        exit(0);
+      default:
+        printf("invalid choice\n");
+    }
   }
 
   close(sock);

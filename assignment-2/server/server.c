@@ -56,7 +56,12 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Connection made, client address: %s\n", inet_ntoa(address.sin_addr));
+    
+    // Read from client
+    read(client_fd, buffer, 1024);
 
+    printf("Message from client: %s\n", buffer);
+    
   }
   
   close(client_fd);
