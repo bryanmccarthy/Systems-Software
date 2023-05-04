@@ -129,6 +129,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
+  // Client loop
   while(1) {
     printf("\nMenu:");
     printf("\n1: Transfer file \n2: Exit \n");

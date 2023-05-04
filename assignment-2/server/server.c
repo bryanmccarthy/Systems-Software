@@ -133,7 +133,6 @@ void *handle_client(void *arg) {
 
       printf("Transfer complete\n");
 
-      // Report the transfer (username, file name, department, time) in report/report.txt
       char report_path[100] = "report/report.txt";
 
       // Lock mutex
