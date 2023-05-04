@@ -9,14 +9,51 @@
 
 #define PORT 8080
 
+// Function to send file to server
+void file_transfer(int sock, char buffer[]) {
+  char file_path[100];
+  char file_name[100];
+
+  // Get file path
+  printf("Enter file path: ");
+  scanf("%s", file_path);
+
+  // Get file name
+  printf("Enter file name: ");
+  scanf("%s", file_name);
+
+  if(access(file_path, F_OK) == -1) {
+    printf("File does not exist\n");
+    return;
+  }
+
+  // Send transfer command to server
+  send(sock, "transfer", strlen("transfer"), 0);
+  sleep(1);
+
+  // Send file name to server
+  send(sock, file_name, strlen(file_name), 0);
+  sleep(1);
+
+  // Open file
+  FILE *fp = fopen(file_path, "r");
+
+  // Send file contents to server
+  while(fgets(buffer, 1024, fp) != NULL) {
+    send(sock, buffer, strlen(buffer), 0);
+    memset(buffer, 0, 1024);
+  }
+
+  // Close file
+  fclose(fp);
+}
+
 int main(int argc, char *argv[]) {
   
   int sock = 0, valread;
   struct sockaddr_in serv_addr;
   char buffer[1024] = {0};
   int menu_choice;
-  char file_path[100];
-  char file_name[100];
   int ngroups;
   gid_t *groups;
 
@@ -87,40 +124,12 @@ int main(int argc, char *argv[]) {
               break;
             }
 
+            // Send manufacturing command to server
             send(sock, "manufacturing", strlen("manufacturing"), 0);
+
+            // Start file transfer
+            file_transfer(sock, buffer);
             
-            // Get file path
-            printf("Enter file path: ");
-            scanf("%s", file_path);
-
-            // Get file name
-            printf("Enter file name: ");
-            scanf("%s", file_name);
-
-            if(access(file_path, F_OK) == -1) {
-              printf("File does not exist\n");
-              break;
-            }
-
-            // Send transfer command to server
-            send(sock, "transfer", strlen("transfer"), 0);
-            sleep(1);
-
-            // Send file name to server
-            send(sock, file_name, strlen(file_name), 0);
-            sleep(1);
-
-            // Open file
-            FILE *fp = fopen(file_path, "r");
-
-            // Send file contents to server
-            while(fgets(buffer, 1024, fp) != NULL) {
-              send(sock, buffer, strlen(buffer), 0);
-              memset(buffer, 0, 1024);
-            }
-
-            // Close file
-            fclose(fp);
             break;
           case 2:
             if(!is_distribution) {
@@ -128,7 +137,11 @@ int main(int argc, char *argv[]) {
               break;
             }
 
+            // Send distribution command to server
             send(sock, "distribution", strlen("distribution"), 0);
+
+            // Start file transfer
+            file_transfer(sock, buffer);
 
             break;
           default:
