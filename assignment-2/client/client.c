@@ -10,7 +10,7 @@
 #define PORT 8080
 
 // Function to send file to server
-void file_transfer(int sock, char buffer[]) {
+void file_transfer(int sock, char buffer[], char username[], char uid[]) {
   char file_path[100];
   char file_name[100];
 
@@ -31,9 +31,19 @@ void file_transfer(int sock, char buffer[]) {
   send(sock, "transfer", strlen("transfer"), 0);
   sleep(1);
 
+  // clear buffer
+  memset(buffer, 0, 1024);
+
   // Send file name to server
   send(sock, file_name, strlen(file_name), 0);
   sleep(1);
+
+  // Send username to server
+  send(sock, username, strlen(username), 0);
+  sleep(1);
+
+  // clear buffer
+  memset(buffer, 0, 1024);
 
   // Open file
   FILE *fp = fopen(file_path, "r");
@@ -46,6 +56,9 @@ void file_transfer(int sock, char buffer[]) {
 
   // Close file
   fclose(fp);
+
+  // clear buffer
+  memset(buffer, 0, 1024);
 }
 
 int main(int argc, char *argv[]) {
@@ -126,9 +139,12 @@ int main(int argc, char *argv[]) {
 
             // Send manufacturing command to server
             send(sock, "manufacturing", strlen("manufacturing"), 0);
+            
+            // clear buffer
+            memset(buffer, 0, 1024);
 
             // Start file transfer
-            file_transfer(sock, buffer);
+            file_transfer(sock, buffer, username, uid);
             
             break;
           case 2:
@@ -139,9 +155,12 @@ int main(int argc, char *argv[]) {
 
             // Send distribution command to server
             send(sock, "distribution", strlen("distribution"), 0);
+            
+            // clear buffer
+            memset(buffer, 0, 1024);
 
             // Start file transfer
-            file_transfer(sock, buffer);
+            file_transfer(sock, buffer, username, uid);
 
             break;
           default:

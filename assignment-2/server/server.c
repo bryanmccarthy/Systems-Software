@@ -5,8 +5,20 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <pthread.h>
+#include <time.h>
 
 #define PORT 8080
+
+// Function to get current time
+void get_time(char *time_str) {
+  time_t rawtime;
+  struct tm *timeinfo;
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  strftime(time_str, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
+}
 
 void *handle_client(void *arg) {
 
@@ -15,6 +27,9 @@ void *handle_client(void *arg) {
   int valread;
   // department
   char department[20] = {0};
+  char username[20] = {0};
+  char file_name[100] = {0};
+  char time_str[80];
 
   while(1) {
 
@@ -43,17 +58,40 @@ void *handle_client(void *arg) {
     if(strcmp(buffer, "transfer") == 0) {
       printf("\n%s transfer started\n", department);
 
+      // clear buffer
+      memset(buffer, 0, 1024);
+
       // Get file name
       valread = read(client_fd, buffer, 1024);
       if (valread == 0) {
         break;
       }
 
+      strcpy(file_name, buffer);
       printf("File name: %s\n", buffer);
+
+      // clear buffer
+      memset(buffer, 0, 1024);
+
+      // Get username
+      valread = read(client_fd, buffer, 1024);
+      if (valread == 0) {
+        break;
+      }
+
+      strcpy(username, buffer);
+      printf("Username: %s\n", username);
+
+      // clear buffer
+      memset(buffer, 0, 1024);
+
+      // Get current time
+      get_time(time_str);
 
       // Create file in department directory
       char file_path[100] = {0};
-      sprintf(file_path, "%s/%s", department, buffer);
+      sprintf(file_path, "%s/%s", department, file_name);
+
       FILE *fp = fopen(file_path, "w");
       if(fp == NULL) {
         perror("fopen");
@@ -73,8 +111,24 @@ void *handle_client(void *arg) {
       fclose(fp);
 
       printf("Transfer complete\n");
+
+      // Report the transfer (username, file name, department, time) in report/report.txt
+      char report_path[100] = "report/report.txt";
+
+      FILE *report_fp = fopen(report_path, "a");
+      if(report_fp == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+      }
+
+      fprintf(report_fp, "%s %s %s %s\n", username, file_name, department, time_str);
+
+      fclose(report_fp);
+
+      printf("Report updated\n");
     }
 
+    // clear buffer
     memset(buffer, 0, 1024);
   }
 
