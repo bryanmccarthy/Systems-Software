@@ -10,7 +10,7 @@
 #define PORT 8080
 
 // Function to send file to server
-void file_transfer(int sock, char buffer[], char username[], char uid[]) {
+void file_transfer(int sock, char buffer[], char username[], uid_t uid) {
   char file_path[100];
   char file_name[100];
 
@@ -18,32 +18,35 @@ void file_transfer(int sock, char buffer[], char username[], char uid[]) {
   printf("Enter file path: ");
   scanf("%s", file_path);
 
-  // Get file name
-  printf("Enter file name: ");
-  scanf("%s", file_name);
-
   if(access(file_path, F_OK) == -1) {
     printf("File does not exist\n");
     return;
   }
 
+  // Get file name
+  printf("Enter file name: ");
+  scanf("%s", file_name);
+
+  /* Start file transfer */
   // Send transfer command to server
   send(sock, "transfer", strlen("transfer"), 0);
-  sleep(1);
-
-  // clear buffer
   memset(buffer, 0, 1024);
+  sleep(1);
 
   // Send file name to server
   send(sock, file_name, strlen(file_name), 0);
+  memset(buffer, 0, 1024);
   sleep(1);
 
   // Send username to server
   send(sock, username, strlen(username), 0);
+  memset(buffer, 0, 1024);
   sleep(1);
 
-  // clear buffer
+  // Send uid to server
+  send(sock, &uid, sizeof(uid), 0);
   memset(buffer, 0, 1024);
+  sleep(1);
 
   // Open file
   FILE *fp = fopen(file_path, "r");
@@ -70,11 +73,15 @@ int main(int argc, char *argv[]) {
   int ngroups;
   gid_t *groups;
 
-  char *username = getlogin();
-  char uid = getuid();
   char departments[2][20] = {"manufacturing", "distribution"};
   bool is_manufacturing = false;
   bool is_distribution = false;
+
+  char *username = getlogin();
+  uid_t uid = getuid();
+
+  printf("Username: %s\n", username);
+  printf("UID: %d\n", uid);
 
   // Get number of groups
   ngroups = getgroups(0, NULL);

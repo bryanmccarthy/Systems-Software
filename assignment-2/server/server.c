@@ -25,9 +25,9 @@ void *handle_client(void *arg) {
   int client_fd = *(int *)arg;
   char buffer[1024] = {0};
   int valread;
-  // department
   char department[20] = {0};
   char username[20] = {0};
+  uid_t uid;
   char file_name[100] = {0};
   char time_str[80];
 
@@ -39,23 +39,25 @@ void *handle_client(void *arg) {
       break;
     }
 
-    printf("Message from client: %s\n", buffer);
+    printf("Command from client: %s\n", buffer);
 
     if(strcmp(buffer, "exit") == 0) {
       break;
     }
 
-    // if buffer = "manufacturing" 
+    // Manufacturing command for department
     if(strcmp(buffer, "manufacturing") == 0) {
       strcpy(department, "manufacturing");
     }
 
-    // if buffer = "distribution"
+    // Distribution command for department
     if(strcmp(buffer, "distribution") == 0) {
       strcpy(department, "distribution");
     }
 
+    // Transfer command
     if(strcmp(buffer, "transfer") == 0) {
+
       printf("\n%s transfer started\n", department);
 
       // clear buffer
@@ -81,6 +83,18 @@ void *handle_client(void *arg) {
 
       strcpy(username, buffer);
       printf("Username: %s\n", username);
+
+      // clear buffer
+      memset(buffer, 0, 1024);
+
+      // Get uid
+      valread = read(client_fd, buffer, 1024);
+      if (valread == 0) {
+        break;
+      }
+
+      uid = *(uid_t *)buffer;
+      printf("UID: %d\n", uid);
 
       // clear buffer
       memset(buffer, 0, 1024);
@@ -121,7 +135,7 @@ void *handle_client(void *arg) {
         exit(EXIT_FAILURE);
       }
 
-      fprintf(report_fp, "%s %s %s %s\n", username, file_name, department, time_str);
+      fprintf(report_fp, "%s - %d - %s - %s %s\n", username, uid, file_name, department, time_str);
 
       fclose(report_fp);
 
