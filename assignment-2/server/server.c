@@ -24,6 +24,7 @@ void *handle_client(void *arg) {
 
   int client_fd = *(int *)arg;
   char buffer[1024] = {0};
+  pthread_mutex_t lock;
   int valread;
   char department[20] = {0};
   char username[20] = {0};
@@ -36,7 +37,6 @@ void *handle_client(void *arg) {
   while(1) {
 
     valread = read(client_fd, buffer, 1024);
-
     if (valread == 0) {
       break;
     }
@@ -108,6 +108,9 @@ void *handle_client(void *arg) {
       char file_path[100] = {0};
       sprintf(file_path, "%s/%s", department, file_name);
 
+      // Lock mutex
+      pthread_mutex_lock(&lock);
+
       FILE *fp = fopen(file_path, "w");
       if(fp == NULL) {
         perror("fopen");
@@ -126,10 +129,16 @@ void *handle_client(void *arg) {
       // Close file
       fclose(fp);
 
+      // Unlock mutex
+      pthread_mutex_unlock(&lock);
+
       printf("Transfer complete\n");
 
       // Report the transfer (username, file name, department, time) in report/report.txt
       char report_path[100] = "report/report.txt";
+
+      // Lock mutex
+      pthread_mutex_lock(&lock);
 
       FILE *report_fp = fopen(report_path, "a");
       if(report_fp == NULL) {
@@ -140,6 +149,9 @@ void *handle_client(void *arg) {
       fprintf(report_fp, "%s - %d - %s - %s %s\n", username, uid, file_name, department, time_str);
 
       fclose(report_fp);
+
+      // Unlock mutex
+      pthread_mutex_unlock(&lock);
 
       printf("Report updated\n");
 
@@ -156,7 +168,6 @@ void *handle_client(void *arg) {
   }
 
   close(client_fd);
-
   return NULL;
 }
 
