@@ -57,10 +57,13 @@ void file_transfer(int sock, char buffer[], char username[], uid_t uid) {
     memset(buffer, 0, 1024);
   }
 
-  // Close file
+  // Close file 
   fclose(fp);
+  memset(buffer, 0, 1024);
 
-  // clear buffer
+  // Receive transfer status from server
+  read(sock, buffer, 1024);
+  printf("%s\n", buffer);
   memset(buffer, 0, 1024);
 }
 

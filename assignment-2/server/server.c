@@ -30,6 +30,8 @@ void *handle_client(void *arg) {
   uid_t uid;
   char file_name[100] = {0};
   char time_str[80];
+  char success_msg[100] = "File transfer successful\n";
+  char failure_msg[100] = "File transfer failed\n";
 
   while(1) {
 
@@ -140,6 +142,13 @@ void *handle_client(void *arg) {
       fclose(report_fp);
 
       printf("Report updated\n");
+
+      // Inform client if transfer was successful or not
+      if(access(file_path, F_OK) != -1) {
+        write(client_fd, success_msg, strlen(success_msg));
+      } else {
+        write(client_fd, failure_msg, strlen(failure_msg));
+      }
     }
 
     // clear buffer
