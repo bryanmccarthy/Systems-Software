@@ -9,7 +9,6 @@
 
 #define PORT 8080
 
-// Function to get current time
 void get_time(char *time_str) {
   time_t rawtime;
   struct tm *timeinfo;
@@ -192,14 +191,12 @@ int main(int argc, char *argv[]) {
 
   // Set address family to IPv4
   address.sin_family = AF_INET;
-  
   // Set address to localhost
   address.sin_addr.s_addr = INADDR_ANY;
-
   // Set port to 8080
   address.sin_port = htons(PORT);
 
-  // Bind socket to address and port
+  // Bind socket to address
   if(bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
     perror("bind failed");
     exit(EXIT_FAILURE);
@@ -233,9 +230,6 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  close(client_fd);
-
   close(server_fd);
-
   return 0;
 }
